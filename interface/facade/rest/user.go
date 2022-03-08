@@ -1,14 +1,18 @@
 package rest
 
 import (
+	"ddd-demo1/application/service"
 	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
+	userSerivce service.IUserService
 }
 
-func NewUserController() *UserController {
-	return &UserController{}
+func NewUserController(userService service.IUserService) *UserController {
+	return &UserController{
+		userSerivce: userService,
+	}
 }
 
 func (this *UserController) GetGroupPath() string {
@@ -24,5 +28,6 @@ func (this *UserController) GetHandleFunc() gin.RoutesInfo {
 }
 
 func (this *UserController) info(ctx *gin.Context) {
+	this.userSerivce.Hello()
 	ctx.JSON(200, 200)
 }
