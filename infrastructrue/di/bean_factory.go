@@ -1,8 +1,9 @@
-package bean_factory
+package di
 
 import (
 	"ddd-demo1/application/service"
 	"ddd-demo1/domain/biz1/repository"
+	"ddd-demo1/infrastructrue/middleware"
 	"ddd-demo1/infrastructrue/persistent/gorm"
 	"ddd-demo1/interface/facade/rest"
 	"ddd-demo1/interface/routeable"
@@ -33,7 +34,10 @@ func (this *BeanFactory) produceRouter() {
 }
 func (this *BeanFactory) produceBean() {
 	this.beans = make(map[string]interface{})
-	this.beans["userRepository"] = gorm.NewUserRepositoryImpl()
+
+	this.beans["gormDatasource"] = middleware.NewGormResource()
+	this.beans["userRepository"] = gorm.NewUserRepositoryImpl(this.beans["gormDatasource"].(*middleware.GormResource))
+
 	this.beans["userService"] = service.NewUserServiceImpl(this.beans["userRepository"].(repository.UserRepository))
 }
 

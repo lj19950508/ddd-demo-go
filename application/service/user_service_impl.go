@@ -15,6 +15,6 @@ func NewUserServiceImpl(userRepository repository.UserRepository) UserService {
 	}
 }
 
-func (this *UserServiceImpl) Hello() *entity.User {
-	return this.userRepository.FindById(1)
+func (this *UserServiceImpl) Info(id uint) (*entity.User, error) {
+	return this.userRepository.FindById(id)
 }

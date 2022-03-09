@@ -1,4 +1,4 @@
-package route_register
+package di
 
 import (
 	"ddd-demo1/interface/routeable"
