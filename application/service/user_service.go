@@ -1,13 +1,7 @@
 package service
 
-type UserService struct {
-}
+import "ddd-demo1/domain/biz1/entity"
 
-func NewUserService() IUserService {
-	return &UserService{}
-}
-
-func (this *UserService) Hello() {
-	println("hello world")
-
+type UserService interface {
+	Hello() *entity.User
 }

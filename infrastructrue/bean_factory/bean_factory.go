@@ -2,6 +2,8 @@ package bean_factory
 
 import (
 	"ddd-demo1/application/service"
+	"ddd-demo1/domain/biz1/repository"
+	"ddd-demo1/infrastructrue/persistent/gorm"
 	"ddd-demo1/interface/facade/rest"
 	"ddd-demo1/interface/routeable"
 	"github.com/gin-gonic/gin"
@@ -26,12 +28,13 @@ func (this *BeanFactory) Run() gin.HandlerFunc {
 
 func (this *BeanFactory) produceRouter() {
 	this.routes = []routeable.Routeable{
-		rest.NewUserController(this.beans["userService"].(service.IUserService)),
+		rest.NewUserController(this.beans["userService"].(service.UserService)),
 	}
 }
 func (this *BeanFactory) produceBean() {
 	this.beans = make(map[string]interface{})
-	this.beans["userService"] = service.NewUserService()
+	this.beans["userRepository"] = gorm.NewUserRepositoryImpl()
+	this.beans["userService"] = service.NewUserServiceImpl(this.beans["userRepository"].(repository.UserRepository))
 }
 
 func (this *BeanFactory) GetRoutes() []routeable.Routeable {
