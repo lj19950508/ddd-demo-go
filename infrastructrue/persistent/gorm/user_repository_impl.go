@@ -18,13 +18,12 @@ func NewUserRepositoryImpl(resource *middleware.GormResource) repository.UserRep
 }
 
 func (this UserRepositoryImpl) FindById(id uint) (*entity.User, error) {
-	user := pojo.NewUserPo()
-	result := this.resource.DB().First(&user, 2)
-	err := result.Error
+	var user pojo.User
+	result := this.resource.DB().First(&user, id)
 	return entity.NewUser(
 		user.ID,
 		user.Name,
-	), err
+	), result.Error
 }
 
 func (this UserRepositoryImpl) Save(user entity.User) {}

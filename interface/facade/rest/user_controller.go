@@ -30,10 +30,8 @@ func (this *UserController) GetHandleFunc() gin.RoutesInfo {
 func (this *UserController) info(ctx *gin.Context) {
 	user, err := this.userSerivce.Info(1)
 	if err != nil {
-		print(1)
 		ctx.JSON(400, err.Error())
 	} else {
-		print(2)
 		ctx.JSON(200, user)
 	}
 }

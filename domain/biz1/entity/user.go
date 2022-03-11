@@ -1,10 +1,10 @@
 package entity
 
 type User struct {
-	id   uint
-	name string
+	ID   uint
+	Name string
 }
 
 func NewUser(id uint, name string) *User {
-	return &User{id: id, name: name}
+	return &User{ID: id, Name: name}
 }
