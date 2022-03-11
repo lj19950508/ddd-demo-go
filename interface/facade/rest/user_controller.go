@@ -26,6 +26,7 @@ func (this *UserController) GetHandleFunc() gin.RoutesInfo {
 		{Method: "GET", Path: "/test", HandlerFunc: this.test},
 	}
 	return routeInfo
+
 }
 
 func (this *UserController) info(ctx *gin.Context) {
