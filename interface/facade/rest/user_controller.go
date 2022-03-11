@@ -3,6 +3,7 @@ package rest
 import (
 	"ddd-demo1/application/service"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 type UserController struct {
@@ -21,14 +22,15 @@ func (this *UserController) GetGroupPath() string {
 
 func (this *UserController) GetHandleFunc() gin.RoutesInfo {
 	routeInfo := gin.RoutesInfo{
-		{Method: "GET", Path: "/info", HandlerFunc: this.info},
+		{Method: "GET", Path: "/info/:id", HandlerFunc: this.info},
 		{Method: "GET", Path: "/test", HandlerFunc: this.test},
 	}
 	return routeInfo
 }
 
 func (this *UserController) info(ctx *gin.Context) {
-	user, err := this.userSerivce.Info(1)
+	id, _ := strconv.ParseUint(ctx.Param("id"), 10, strconv.IntSize)
+	user, err := this.userSerivce.Info(uint(id))
 	if err != nil {
 		ctx.JSON(400, err.Error())
 	} else {

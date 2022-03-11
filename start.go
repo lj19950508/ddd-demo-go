@@ -22,7 +22,7 @@ func main() {
 	engine.Use(facotry.Run())
 	engine.Use(di.NewRouteRigster(facotry.GetRoutes()).Run(engine))
 
-	engine.Use()
+	//engine.Use()
 
 	//4. todo使用router工厂配合bean的controller 注册路由
 	//装配过滤器？ 可能依赖于group 先不做
