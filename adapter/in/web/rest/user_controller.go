@@ -1,8 +1,6 @@
-package rest
+package adapter
 
 import (
-	"ddd-demo1/application/service"
-	"github.com/gin-gonic/gin"
 	"strconv"
 )
 

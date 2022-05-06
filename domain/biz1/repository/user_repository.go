@@ -1,6 +1,7 @@
-package repository
+package domain
 
 type UserRepository interface {
+
 	//domain
 	FindById(id uint) (*entity.User, error)
 
