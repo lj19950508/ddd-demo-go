@@ -1,7 +1,6 @@
 package main
 
 import (
-	"ddd-demo1/infrastructrue/di"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,9 +17,8 @@ func main() {
 	//2.装配日志
 	engine.Use(gin.Logger())
 	//3.生产装配bean 与路由
-	facotry := di.NewBeanFactory()
-	engine.Use(facotry.Run())
-	engine.Use(di.NewRouteRigster(facotry.GetRoutes()).Run(engine))
+	//engine.Use(facotry.Run())
+	//engine.Use(di.NewRouteRigster(facotry.GetRoutes()).Run(engine))
 
 	//engine.Use()
 

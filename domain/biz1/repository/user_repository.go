@@ -1,5 +1,7 @@
 package domain
 
+import entity "ddd-demo-go/domain/biz1/entity"
+
 type UserRepository interface {
 
 	//domain

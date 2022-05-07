@@ -5,6 +5,6 @@ type User struct {
 	Name string
 }
 
-func NewUser(id uint, name string) *User {
+func New(id uint, name string) *User {
 	return &User{ID: id, Name: name}
 }

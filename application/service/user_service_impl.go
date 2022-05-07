@@ -1,8 +1,8 @@
 package service
 
 import (
-	"ddd-demo1/domain/biz1/entity"
-	"ddd-demo1/domain/biz1/repository"
+	entity "ddd-demo-go/domain/biz1/entity"
+	repository "ddd-demo-go/domain/biz1/repository"
 )
 
 type UserServiceImpl struct {
