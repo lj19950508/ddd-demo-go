@@ -2,32 +2,35 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func main() {
-	gin.SetMode(gin.DebugMode)
+	//todo 1.装配配置文件
+	//todo 2.装配日志
 
+	//启动web服务
+	//加载第三方中间件（自动重连）
+
+	//要有一个管理Controller Service 的工具
+	//gin.SetMode(gin.DebugMode)
 	engine := gin.New()
+	//engine.Use(gin.Recovery())
 	//engine.SetTrustedProxies(nil)
 
-	//todo 1.装配配置文件
-	//engine.Use(middleware.Run())
+	//注册理由
+	//engine.Routes()
+	_ = http.Server{
+		//Handler: engine,
+		//ReadTimeout:,
+		//WriteTimeout: ,
+		//Addr:
+
+	}
+
 	//使用recover功能
-	engine.Use(gin.Recovery())
+
 	//2.装配日志
-	engine.Use(gin.Logger())
-	//3.生产装配bean 与路由
-	//engine.Use(facotry.Run())
-	//engine.Use(di.NewRouteRigster(facotry.GetRoutes()).Run(engine))
-
-	//engine.Use()
-
-	//4. todo使用router工厂配合bean的controller 注册路由
-	//装配过滤器？ 可能依赖于group 先不做
-	//装配数据库
-	//装配第三方组件
-	//engine.
-
-	engine.Run()
+	//engine.Use(gin.Logger())
 
 }
