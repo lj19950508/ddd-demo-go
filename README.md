@@ -12,12 +12,14 @@
 错误处理层层返回到controler 层处理 ， recover层只是为了防止意外。一般是
 if(err!=nil){
   return err
-}
+}，有业务错误则errors.new 一个回去在外层处理 ，
 
 ....
 
 
 【规则1.3.2】禁止使用相对路径导入（./subpackage），所有导入路径必须符合 go get 标准。
 【建议1.3.3】建议使用goimports工具或者IDE工具来管理多行import
-
+...包名规范
+... 是否使用指针规范 。。。
 更多规范 //https://www.jianshu.com/p/20861de6332c
+错误处理 https://zhuanlan.zhihu.com/p/328591249
