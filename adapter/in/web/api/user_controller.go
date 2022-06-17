@@ -6,19 +6,19 @@ import (
 	"strconv"
 )
 
-type UserController struct {
+type UserApi struct {
 	userSerivce service.UserService
 }
 
-func NewUserController(userService service.UserService) *UserController {
-	return &UserController{
+func NewUserApi(userService service.UserService) *UserApi {
+	return &UserApi{
 		userSerivce: userService,
 	}
 }
 
-func (this *UserController) Info(ctx *gin.Context) {
+func (t *UserApi) Info(ctx *gin.Context) {
 	id, _ := strconv.ParseUint(ctx.Param("id"), 10, strconv.IntSize)
-	user, err := this.userSerivce.Info(uint(id))
+	user, err := t.userSerivce.Info(uint(id))
 	if err != nil {
 		ctx.JSON(400, err.Error())
 	} else {
@@ -26,6 +26,6 @@ func (this *UserController) Info(ctx *gin.Context) {
 	}
 }
 
-func (this *UserController) test(ctx *gin.Context) {
+func (t *UserApi) test(ctx *gin.Context) {
 	ctx.JSON(200, 200)
 }
