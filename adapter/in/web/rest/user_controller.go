@@ -16,20 +16,7 @@ func NewUserController(userService service.UserService) *UserController {
 	}
 }
 
-func (this *UserController) GetGroupPath() string {
-	return "/user"
-}
-
-func (this *UserController) GetHandleFunc() gin.RoutesInfo {
-	routeInfo := gin.RoutesInfo{
-		{Method: "GET", Path: "/info/:id", HandlerFunc: this.info},
-		{Method: "GET", Path: "/test", HandlerFunc: this.test},
-	}
-	return routeInfo
-
-}
-
-func (this *UserController) info(ctx *gin.Context) {
+func (this *UserController) Info(ctx *gin.Context) {
 	id, _ := strconv.ParseUint(ctx.Param("id"), 10, strconv.IntSize)
 	user, err := this.userSerivce.Info(uint(id))
 	if err != nil {
