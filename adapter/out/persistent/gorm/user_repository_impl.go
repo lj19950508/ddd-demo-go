@@ -7,7 +7,7 @@ type UserRepositoryImpl struct {
 }
 
 func NewUserRepositoryImpl() repository.UserRepository {
-	return &UserRepositoryImpl{}
+	return UserRepositoryImpl{}
 }
 
 func (t UserRepositoryImpl) FindById(id int) (*entity.User, error) {

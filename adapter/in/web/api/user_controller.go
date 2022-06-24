@@ -1,4 +1,4 @@
-package adapter
+package api
 
 import (
 	"ddd-demo-go/application/service"
