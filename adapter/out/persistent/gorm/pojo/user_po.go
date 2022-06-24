@@ -3,7 +3,7 @@ package pojo
 //表名为
 type User struct {
 	//ID主键
-	ID   uint
+	ID   int
 	Name string
 }
 

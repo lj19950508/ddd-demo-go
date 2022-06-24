@@ -3,29 +3,33 @@ package adapter
 import (
 	"ddd-demo-go/application/service"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 type UserApi struct {
-	userSerivce service.UserService
+	userService service.UserService
 }
 
-func NewUserApi(userService service.UserService) *UserApi {
-	return &UserApi{
-		userSerivce: userService,
+func NewUserApi(userService service.UserService) UserApi {
+
+	return UserApi{
+		userService: userService,
 	}
 }
 
 func (t *UserApi) Info(ctx *gin.Context) {
-	id, _ := strconv.ParseUint(ctx.Param("id"), 10, strconv.IntSize)
-	user, err := t.userSerivce.Info(uint(id))
+	//1.转换参数成dto
+	//2.验证dto参数
+	//3.传入参数dto
+	user, err := t.userService.Info(1)
 	if err != nil {
 		ctx.JSON(400, err.Error())
 	} else {
 		ctx.JSON(200, user)
 	}
+	//4.处理返回
 }
 
 func (t *UserApi) test(ctx *gin.Context) {
+
 	ctx.JSON(200, 200)
 }

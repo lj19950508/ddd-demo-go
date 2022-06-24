@@ -6,12 +6,14 @@ import entity "ddd-demo-go/domain/biz1/entity"
 type UserRepositoryImpl struct {
 }
 
-func New() repository.UserRepository {
+func NewUserRepositoryImpl() repository.UserRepository {
 	return &UserRepositoryImpl{}
 }
 
-func (this UserRepositoryImpl) FindById(id uint) (*entity.User, error) {
+func (t UserRepositoryImpl) FindById(id int) (*entity.User, error) {
 	return nil, nil
 }
 
-func (this UserRepositoryImpl) Save(user entity.User) {}
+func (t UserRepositoryImpl) Save(user entity.User) {
+
+}

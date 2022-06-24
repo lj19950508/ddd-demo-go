@@ -1,10 +1,10 @@
 package domain
 
 type User struct {
-	ID   uint
+	ID   int
 	Name string
 }
 
-func NewUser(id uint, name string) *User {
+func NewUser(id int, name string) *User {
 	return &User{ID: id, Name: name}
 }

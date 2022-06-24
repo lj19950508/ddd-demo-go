@@ -5,7 +5,7 @@ import entity "ddd-demo-go/domain/biz1/entity"
 type UserRepository interface {
 
 	//domain
-	FindById(id uint) (*entity.User, error)
+	FindById(id int) (*entity.User, error)
 
 	//FindList() []*entity.User
 

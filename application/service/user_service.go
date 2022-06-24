@@ -6,19 +6,19 @@ import (
 )
 
 type UserService interface {
-	Info(id uint) (*entity.User, error)
+	Info(id int) (*entity.User, error)
 }
 
 type UserServiceImpl struct {
 	userRepository repository.UserRepository
 }
 
-func New(userRepository repository.UserRepository) UserService {
+func NewUserService(userRepository repository.UserRepository) UserService {
 	return &UserServiceImpl{
 		userRepository: userRepository,
 	}
 }
 
-func (this *UserServiceImpl) Info(id uint) (*entity.User, error) {
-	return this.userRepository.FindById(id)
+func (t *UserServiceImpl) Info(id int) (*entity.User, error) {
+	return t.userRepository.FindById(id)
 }
