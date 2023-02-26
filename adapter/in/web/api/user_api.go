@@ -9,9 +9,8 @@ type UserApi struct {
 	userService service.UserService
 }
 
-func NewUserApi(userService service.UserService) UserApi {
-
-	return UserApi{
+func NewUserApi(userService service.UserService) *UserApi {
+	return &UserApi{
 		userService: userService,
 	}
 }
