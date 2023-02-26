@@ -3,7 +3,6 @@ package factory
 import (
 	"fmt"
 	"testing"
-	"unsafe"
 )
 
 type Test struct {
@@ -18,22 +17,23 @@ func test() {
 }
 
 func TestIOC(t *testing.T) {
-
-	Register(&Test{})
-	Register(&Test1{})
-	Register(&Test2{})
+	ioc := &IOC{}
+	RegisterToIOC(ioc, &Test{})
+	// Register(&Test1{})
+	// Register(&Test2{})
 
 	var a *Test1
-	var aa *Test2
-	var b = (*Test1)(nil)
-	fmt.Println(unsafe.Sizeof(a))
-	var b = (*Test1)(nil)
-	fmt.Println(unsafe.Sizeof(b))
+	// var aa *Test2
+	// var b = (*Test1)(nil)
+	// fmt.Println(unsafe.Sizeof(a))
+	// var b = (*Test1)(nil)
+	// fmt.Println(unsafe.Sizeof(b))
 
 	//传入了一个空类型
-	ioc :=&IOC{}
-	aa =Get(a)
-	
+	// ioc :=&IOC[any]{}
+	fmt.Println(a)
+	a = GetFromIOC(*ioc, a)
+
 	// Get[Test]()
 	// test :=Test{}
 

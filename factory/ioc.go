@@ -10,23 +10,23 @@ type IOC struct {
 	data map[reflect.Type]any
 }
 
-func NewIOC() *IOC{
+func NewIOC[T any]() *IOC{
 	return &IOC{
 		data:make(map[reflect.Type]any),
 	}
 }
 
-func (s *IOC) RegisterAll(data map[reflect.Type]any) {
-	s.data = data
+func RegisterAllToIOC(ioc IOC,data map[reflect.Type]any) {
+	ioc.data = data
 }
 
-func (s IOC) Register(instance any) {
+func RegisterToIOC(ioc *IOC,instance any) {
 	fieldType := reflect.TypeOf(instance)
-	s.data[fieldType] = instance
+	ioc.data[fieldType] = instance
 }
 
 //传入类型与传出一致
-func Get[T any](s IOC,instance T) T {
+func GetFromIOC[T any](ioc IOC,instance T) T {
 	fieldType := reflect.TypeOf(instance)
-	return s.data[fieldType].(T)
+	return ioc.data[fieldType].(T)
 }
