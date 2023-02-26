@@ -17,8 +17,8 @@ func test() {
 }
 
 func TestIOC(t *testing.T) {
-	ioc := &IOC{}
-	RegisterToIOC(ioc, &Test{})
+	ioc := NewIOC()
+	RegisterToIOC(ioc, &Test1{})
 	// Register(&Test1{})
 	// Register(&Test2{})
 
@@ -32,7 +32,7 @@ func TestIOC(t *testing.T) {
 	//传入了一个空类型
 	// ioc :=&IOC[any]{}
 	fmt.Println(a)
-	a = GetFromIOC(*ioc, a)
+	a = GetFromIOC(*ioc, (*Test1)(nil))
 
 	// Get[Test]()
 	// test :=Test{}
