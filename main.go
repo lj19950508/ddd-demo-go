@@ -4,6 +4,7 @@ import (
 	"ddd-demo-go/adapter/in/web"
 	"ddd-demo-go/adapter/out/persistent/orm"
 	"ddd-demo-go/config"
+	"ddd-demo-go/factory"
 )
 
 func main() {
