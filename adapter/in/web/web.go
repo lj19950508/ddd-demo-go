@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"ddd-demo-go/adapter/in/web/api"
 	"ddd-demo-go/config"
 	"ddd-demo-go/factory"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +26,7 @@ func initWeb(cfg *config.Config) *http.Server {
 
 	// group:=router.Group()
 	
-	userApi:=factory.GetUserApi()
+	userApi:=factory.Get[api.UserApi]()
 	router.GET("/", userApi.Info)
 
 	//这里依赖到controller.

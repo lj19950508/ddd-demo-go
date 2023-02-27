@@ -1,35 +1,33 @@
 package factory
 
 import (
-	"fmt"
 	"reflect"
 )
 
+var ioc = make(map[reflect.Type]any)
 
-
-type IOC struct {
-	data map[reflect.Type]any
-}
-
-func NewIOC() *IOC{
-	return &IOC{
-		data:make(map[reflect.Type]any),
+func RegisterAll(data []any) {
+	for i := 0; i < len(data); i++ {
+		Register(data[i])
 	}
 }
 
-func RegisterAllToIOC(ioc IOC,data map[reflect.Type]any) {
-	ioc.data = data
+func Register(instance any) {
+	//instance必须为指针
+	if reflect.ValueOf(instance).Kind() != reflect.Pointer {
+		panic("必须是指针才能注册")
+	}
+
+	instanceType := reflect.TypeOf(instance)
+
+	if ioc[instanceType] != nil {
+		panic("已存在，请勿重复注册")
+	}
+	ioc[instanceType] = instance
 }
 
-func RegisterToIOC(ioc *IOC,instance any) {
-	fieldType := reflect.TypeOf(instance)
-	ioc.data[fieldType] = instance
-}
-
-//传入类型与传出一致
-func GetFromIOC[T any](ioc IOC,instance T) T {
-	fieldType := reflect.TypeOf(instance)
-	fmt.Println(fieldType)
-	fmt.Println(ioc.data)
-	return ioc.data[fieldType].(T)
+func Get[T any]() *T {
+	//(*T)(nil) 声明一个类型T为空 约等于 c#的 typeof(T)
+	instanceType := reflect.TypeOf((*T)(nil))
+	return ioc[instanceType].(*T)
 }

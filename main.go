@@ -13,6 +13,7 @@ func main() {
 		panic(err)
 	}
 
+	
 	//加载通用中间件 如日志。。。
 	//errors.Wrap()
 	//set logger

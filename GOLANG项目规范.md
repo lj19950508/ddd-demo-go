@@ -28,6 +28,8 @@
  - 【建议1.3.3】建议使用goimports工具或者IDE工具来管理多行import
 
 
+//泛型
+https://taoshu.in/go/generics/design.html
 更多规范 //https://www.jianshu.com/p/20861de6332c
 错误处理 https://zhuanlan.zhihu.com/p/328591249
 
