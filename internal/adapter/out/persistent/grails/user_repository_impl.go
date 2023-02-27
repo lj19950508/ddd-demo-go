@@ -1,8 +1,8 @@
 package grails
 
 import (
-	entity "ddd-demo-go/domain/biz1/entity"
-	repository "ddd-demo-go/domain/biz1/repository"
+	entity "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/entity"
+	repository "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/repository"
 	"gorm.io/gorm"
 )
 

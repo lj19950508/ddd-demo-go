@@ -26,6 +26,7 @@
 ## 引入标准
  - 【规则1.3.2】禁止使用相对路径导入（./subpackage），所有导入路径必须符合 go get 标准。
  - 【建议1.3.3】建议使用goimports工具或者IDE工具来管理多行import
+ - module 以全仓库命名 module github.com/evrone/go-clean-template
 
 
 //泛型
@@ -33,3 +34,5 @@ https://taoshu.in/go/generics/design.html
 更多规范 //https://www.jianshu.com/p/20861de6332c
 错误处理 https://zhuanlan.zhihu.com/p/328591249
 
+
+//panic.. 日志记得找规范

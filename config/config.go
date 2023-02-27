@@ -5,14 +5,14 @@ import (
 )
 
 type Config struct {
-	Port int
+	Port string `env-required:"true" yaml:"port"    env:"HTTP_PORT"`
 }
 
 //错误的处理凡事按这个
 func NewConfig() (cfg *Config, err error) {
 	cfg = &Config{}
 
-	err = cleanenv.ReadConfig("config/config.yml", cfg)
+	err = cleanenv.ReadConfig("./config/config.yml", cfg)
 	if err != nil {
 		return
 	}

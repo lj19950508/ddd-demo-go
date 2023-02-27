@@ -1,18 +1,24 @@
-package api
+package v1
 
 import (
-	"ddd-demo-go/application/service"
 	"github.com/gin-gonic/gin"
+	"github.com/lj19950508/ddd-demo-go/internal/application/service"
 )
 
 type UserApi struct {
 	userService service.UserService
 }
 
-func NewUserApi(userService service.UserService) *UserApi {
-	return &UserApi{
+func NewUserApi(handler *gin.RouterGroup,userService service.UserService) {
+	userApi:=&UserApi{
 		userService: userService,
 	}
+	routerGroup:=handler.Group("/user")
+	{
+		routerGroup.GET("/info",userApi.Info)
+	}
+
+
 }
 
 func (t *UserApi) Info(ctx *gin.Context) {
