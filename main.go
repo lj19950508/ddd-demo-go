@@ -2,7 +2,7 @@ package main
 
 import (
 	"ddd-demo-go/adapter/in/web"
-	"ddd-demo-go/adapter/out/persistent/orm"
+	"ddd-demo-go/adapter/out/persistent/grails"
 	"ddd-demo-go/config"
 	"ddd-demo-go/factory"
 )
@@ -14,7 +14,6 @@ func main() {
 		panic(err)
 	}
 
-	
 	//加载通用中间件 如日志。。。
 	//errors.Wrap()
 	//set logger
@@ -28,7 +27,7 @@ func main() {
 	web.StartWeb(cfg)
 
 	//解决ioc问题
-	orm.StartOrm()
+	factory.Register(grails.StartOrm())
 
 }
 
