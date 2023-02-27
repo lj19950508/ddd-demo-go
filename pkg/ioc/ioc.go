@@ -1,4 +1,4 @@
-package i
+package ioc
 
 import (
 	"reflect"

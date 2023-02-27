@@ -5,20 +5,20 @@ import (
 	"fmt"
 	"os/signal"
 	"syscall"
-
-	"github.com/lj19950508/ddd-demo-go/config"
-	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
-
 	"github.com/gin-gonic/gin"
+	"github.com/lj19950508/ddd-demo-go/config"
+	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api"
+	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 )
 
 func Run(cfg *config.Config) {
 	var err error
-	//创建通用系统日志对象
-
+	//TODO 建通用系统日志对象
+	//初始化mysql
+	//mysql.new...  defer close.
 	//web服务
 	handle := gin.New()
-
+	api.NewRouter(handle)
 	httpServer := httpserver.New(handle, httpserver.Port(cfg.Port))
 
 	//监听信号
