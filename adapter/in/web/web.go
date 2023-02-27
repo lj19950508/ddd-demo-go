@@ -15,6 +15,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
+//factoryImpl->api   register
+//api->ifactory   get  //就得注入Ifactory了。。
+//main ->ifcatroy  &api &I           i = new Impl()
 //启动web
 //监听web
 //web路由

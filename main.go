@@ -24,6 +24,10 @@ func main() {
 	// ppi := api.NewUserApi(svc)
 	//初始化具体组件 如mysql web socket mq
 	//web server do
+
+	// in -> iioc
+	// ioc -> in/out/
+	// main -> in/out /ioc
 	web.StartWeb(cfg)
 
 	//解决ioc问题
