@@ -32,7 +32,7 @@ func main() {
 
 	//解决ioc问题
 	factory.Register(grails.StartOrm())
-
+	//ioc 关键思想   别人依赖我 ，我不能依赖别人
 }
 
 //有一个创建返回controler的
