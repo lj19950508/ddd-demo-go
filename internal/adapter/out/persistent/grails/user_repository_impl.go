@@ -5,7 +5,6 @@ import (
 	entity "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/entity"
 	repository "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/repository"
 	"github.com/lj19950508/ddd-demo-go/pkg/mysql"
-	"github.com/pkg/errors"
 )
 
 type UserRepositoryImpl struct {
@@ -25,7 +24,7 @@ func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
 	result := t.GormDb.First(&userPo, id)
 	//处理数据库异常
 	if result.Error != nil {
-		return nil, errors.WithStack(result.Error)
+		return nil, result.Error
 	}
 	//把po->domain
 	domainUser := entity.NewUser(userPo.Id, userPo.Name)

@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/internal/application/service"
-	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 )
 
 type UserApi struct {
@@ -35,7 +34,7 @@ func (t *UserApi) Info(ctx *gin.Context) {
 	//3.验证参数
 	//4.dto->domain
 	//5.domian->dto
-	//6.处理异常病打印堆栈  
+	//6.处理异常病打印堆栈
 	//7.(业务吗与异常系统)
 	//TODO 8.ResultDTO
 
@@ -46,10 +45,11 @@ func (t *UserApi) Info(ctx *gin.Context) {
 	// 结论  有error声明的都是业务错误， 没有被error识别的 会被panic recover 为服务器错误
 	user, err := t.userService.Info(1)
 	if err != nil {
-		logger.Instance.Error("%+v",err)
+		//TODO if erroris .... 怎样怎样
+		//对err判断并处理
 		ctx.JSON(http.StatusBadRequest, err.Error())
-	} else {
-		ctx.JSON(http.StatusOK, user)
-	}
-	
+		return
+	} 
+	ctx.JSON(http.StatusOK, user)
+
 }
