@@ -23,7 +23,7 @@ func Run(cfg *config.Config) {
 	//注册第三方插件的start
 	//初始化mysql
 	//mysql.new...  defer close.
-	mysql, err := mysql.New(",")
+	mysql, err := mysql.New(cfg.Mysql.Url)
 	//if err
 	if err != nil {
 		logger.Instance.Fatal("%s", err)

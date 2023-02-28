@@ -6,22 +6,22 @@ import "time"
 type Option func(*Mysql)
 
 // MaxPoolSize -.
-func MaxPoolSize(size int) Option {
+func MaxIdleConns(size int) Option {
 	return func(c *Mysql) {
-		c.maxPoolSize = size
+		c.MaxIdleConns = size
 	}
 }
 
 // ConnAttempts -.
-func ConnAttempts(attempts int) Option {
+func MaxOpenConns(attempts int) Option {
 	return func(c *Mysql) {
-		c.connAttempts = attempts
+		c.MaxOpenConns = attempts
 	}
 }
 
 // ConnTimeout -.
-func ConnTimeout(timeout time.Duration) Option {
+func ConnMaxLifetime(timeout time.Duration) Option {
 	return func(c *Mysql) {
-		c.connTimeout = timeout
+		c.ConnMaxLifetime = timeout
 	}
 }

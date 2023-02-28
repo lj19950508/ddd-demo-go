@@ -6,12 +6,17 @@ import (
 )
 
 type Config struct {
-	Port string `env-required:"true" yaml:"port"    env:"HTTP_PORT"`
-	Log  `yaml:"logger"`
+	Port  string `env-required:"true" yaml:"port"    env:"HTTP_PORT"`
+	Log   `yaml:"logger"`
+	Mysql `yaml:"mysql"`
 }
 
 type Log struct {
-	Level string `env-required:"true" yaml:"log_level"   env:"LOG_LEVEL"`
+	Level string `env-required:"true" yaml:"level"   env:"LOG_LEVEL"`
+}
+
+type Mysql struct {
+	Url string `env-required:"true" yaml:"url" env:"MYSQL_URL"`
 }
 
 //错误的处理凡事按这个

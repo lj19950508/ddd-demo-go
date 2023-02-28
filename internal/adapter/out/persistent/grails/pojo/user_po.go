@@ -3,10 +3,10 @@ package pojo
 //表名为
 type User struct {
 	//ID主键
-	ID   int
+	Id   int
 	Name string
 }
 
-func NewUserPo() *User {
+func NewUserPO() *User {
 	return &User{}
 }
