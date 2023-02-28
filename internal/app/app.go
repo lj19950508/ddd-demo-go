@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"os/signal"
 	"syscall"
 
@@ -16,6 +15,7 @@ import (
 func Run(cfg *config.Config) {
 	var err error
 	logger.New(cfg.Log.Level)
+	//从下面开始可以使用 logger.Instance
 	wire()
 
 	//初始化mysql
@@ -35,21 +35,20 @@ func Run(cfg *config.Config) {
 
 	//循环while直至收到线程关闭信号 或者httpserver关闭信号（这个不清楚）,或者rmq关闭信号
 	//某个case执行成功就会往下执行，除非有for
+
 	select {
-	case s := <-ctx.Done():
-		fmt.Println(s)
+	case <-ctx.Done():
+		//ctrl c 会走到这
+		logger.Instance.Info("context done")
 	case err = <-httpServer.Notify():
-		fmt.Print("err http" + err.Error())
-		// case err = ...
+		logger.Instance.Error("httpServer.shutdown:%s", err)
 	}
 
-	//执行关闭代码（安全关闭）
 	err = httpServer.Shutdown()
 	if err != nil {
-		fmt.Println("hh")
+		//关闭如果出错 则会走这
+		logger.Instance.Error("httpServer.shutdown:%w", err)
 	}
-	//.....
-
 }
 
 //耻辱代码

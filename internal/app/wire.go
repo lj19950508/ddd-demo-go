@@ -1,6 +1,6 @@
 package app
 
-import "github.com/lj19950508/ddd-demo-go/pkg/logger"
+// import "github.com/lj19950508/ddd-demo-go/pkg/logger"
 
 //区分什么是不运行就关掉的   redis不必须， mysql 必须  ,mq（可选）必须。。等等  必须的 要监听错误的话得关闭当前整个服务以便于被观测到， 或者得发送通知，
 //只会在两个地方register  wire和main
@@ -9,5 +9,4 @@ import "github.com/lj19950508/ddd-demo-go/pkg/logger"
 
 func wire() {
 
-	logger.Instance.Info("hh")
 }

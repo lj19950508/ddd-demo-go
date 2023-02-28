@@ -5,9 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	v1 "github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api/v1"
-	"github.com/lj19950508/ddd-demo-go/internal/application/service"
-	"github.com/lj19950508/ddd-demo-go/pkg/ioc"
 )
 
 // NewRouter -.
@@ -19,12 +16,11 @@ import (
 // @BasePath    /v1
 func NewRouter(handler *gin.Engine) {
 
-
 	// K8s probe
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 
 	// Routers
-	h := handler.Group("/v1")
+	// h := handler.Group("/v1")
 	//为api配置路由，创建api
-	v1.NewUserApi(h,ioc.Get[service.UserServiceImpl]())
+	// v1.NewUserApi(h,ioc.Get[service.UserServiceImpl]())
 }

@@ -1,7 +1,7 @@
 package ioc
 
 import (
-	"log"
+	"fmt"
 	"reflect"
 )
 
@@ -16,14 +16,13 @@ func RegisterAll(data []any) {
 func Register(instance any) {
 	//instance必须为指针
 	if reflect.ValueOf(instance).Kind() != reflect.Pointer {
-		log.Fatalf("Cloud not register an object without pointer")
-
+		panic("Cloud not register an object without pointer")
 	}
 
 	instanceType := reflect.TypeOf(instance)
 
 	if ioc[instanceType] != nil {
-		log.Fatalf("Could not register an exists object")
+		panic("Could not register an exists object")
 	}
 	ioc[instanceType] = instance
 }
@@ -34,7 +33,7 @@ func Get[T any]() *T {
 	//try error
 	val, ok := ioc[instanceType].(*T)
 	if !ok {
-		log.Fatalf("Could not find in ioc: %s", instanceType)
+		panic(fmt.Sprintf("Could not find in ioc: %s", instanceType))
 	}
 	return val
 }
