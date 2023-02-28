@@ -28,6 +28,7 @@ func Run(cfg *config.Config) {
 	if err != nil {
 		logger.Instance.Fatal("%s", err)
 	}
+	defer mysql.Close()
 
 	ioc.Register(mysql)
 	wire()
