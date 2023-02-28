@@ -9,19 +9,30 @@ import (
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
+	"github.com/lj19950508/ddd-demo-go/pkg/ioc"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
+	"github.com/lj19950508/ddd-demo-go/pkg/mysql"
 )
 
 func Run(cfg *config.Config) {
 	var err error
+
 	logger.New(cfg.Log.Level)
 	//从下面开始可以使用 logger.Instance
-	wire()
 
+	//注册第三方插件的start
 	//初始化mysql
 	//mysql.new...  defer close.
+	mysql, err := mysql.New(",")
+	//if err
+	if err != nil {
+		logger.Instance.Fatal("%s", err)
+	}
 
-	//web服务
+	ioc.Register(mysql)
+	wire()
+
+	//web服务  socket等 输入服务输入服务写在下面
 	handle := gin.New()
 	api.NewRouter(handle)
 	httpServer := httpserver.New(handle, httpserver.Port(cfg.Port))
@@ -30,12 +41,9 @@ func Run(cfg *config.Config) {
 	// interrup t := make(chan os.Signal, 1)
 	// signal.Noti(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	// 	//延后执行stop 重制信号
 	defer stop()
-
 	//循环while直至收到线程关闭信号 或者httpserver关闭信号（这个不清楚）,或者rmq关闭信号
 	//某个case执行成功就会往下执行，除非有for
-
 	select {
 	case <-ctx.Done():
 		//ctrl c 会走到这

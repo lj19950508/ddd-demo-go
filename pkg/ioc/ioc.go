@@ -7,13 +7,13 @@ import (
 
 var ioc = make(map[reflect.Type]any)
 
-func RegisterAll(data []any) {
+func Register(data ...any) {
 	for i := 0; i < len(data); i++ {
-		Register(data[i])
+		register(data[i])
 	}
 }
 
-func Register(instance any) {
+func register(instance any) {
 	//instance必须为指针
 	if reflect.ValueOf(instance).Kind() != reflect.Pointer {
 		panic("Cloud not register an object without pointer")
