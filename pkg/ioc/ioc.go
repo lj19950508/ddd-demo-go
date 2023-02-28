@@ -1,6 +1,7 @@
 package ioc
 
 import (
+	"log"
 	"reflect"
 )
 
@@ -29,5 +30,10 @@ func Register(instance any) {
 func Get[T any]() *T {
 	//(*T)(nil) 声明一个类型T为空 约等于 c#的 typeof(T)
 	instanceType := reflect.TypeOf((*T)(nil))
-	return ioc[instanceType].(*T)
+	//try error
+	val, ok := ioc[instanceType].(*T)
+	if !ok {
+		log.Fatalf("Could not find in ioc: %s", instanceType)
+	}
+	return val
 }

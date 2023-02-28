@@ -8,6 +8,7 @@ func main() {
 
 	cfg, err := config.NewConfig()
 	if err != nil {
+		//配置文件是最底层的,所以直接panic
 		panic(err)
 	}
 

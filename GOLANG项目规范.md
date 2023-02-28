@@ -17,8 +17,10 @@
  - 使用基础类型Or nulltype
  - 不使用枚举类
 ## 错误使用规范以及返回规范
- - 不在服务中直接panic异常，返回到controller中处理
- - errors.wrapper 只在产生的地方使用
+ - 不在服务中直接处理异常，返回到controller中处理
+ - 只有在一些强依赖的服务错误时才panic
+ - 在web容器api的错误都不panic，并且外层recover
+ - errors.wrapper(在应用层的最后一层（产生的地方）使用包装，不在基础层使用，也不处处使用)
 ## 单元测试规范
  - 单元测试用 _test.go ， 函数名以Test开头
  - 单元测试写在相同的包

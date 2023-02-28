@@ -5,17 +5,22 @@ import (
 	"fmt"
 	"os/signal"
 	"syscall"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
+	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 )
 
 func Run(cfg *config.Config) {
 	var err error
-	//TODO 建通用系统日志对象
+	logger.New(cfg.Log.Level)
+	wire()
+
 	//初始化mysql
 	//mysql.new...  defer close.
+
 	//web服务
 	handle := gin.New()
 	api.NewRouter(handle)
@@ -25,7 +30,7 @@ func Run(cfg *config.Config) {
 	// interrup t := make(chan os.Signal, 1)
 	// signal.Noti(interrupt, os.Interrupt, syscall.SIGTERM)
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-// 	//延后执行stop 重制信号
+	// 	//延后执行stop 重制信号
 	defer stop()
 
 	//循环while直至收到线程关闭信号 或者httpserver关闭信号（这个不清楚）,或者rmq关闭信号
@@ -34,13 +39,13 @@ func Run(cfg *config.Config) {
 	case s := <-ctx.Done():
 		fmt.Println(s)
 	case err = <-httpServer.Notify():
-		fmt.Print("err http"+err.Error())
-	// case err = ...
+		fmt.Print("err http" + err.Error())
+		// case err = ...
 	}
 
 	//执行关闭代码（安全关闭）
 	err = httpServer.Shutdown()
-	if(err!=nil){
+	if err != nil {
 		fmt.Println("hh")
 	}
 	//.....
