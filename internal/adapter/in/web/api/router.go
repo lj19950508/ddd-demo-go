@@ -19,12 +19,15 @@ import (
 // @BasePath    /v1
 func NewRouter(handler *gin.Engine) {
 
+	handler.Use(gin.Recovery())
 
+	//访问日志 缺少入参处参
+	handler.Use(gin.Logger())
 	// K8s probe
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 
 	// Routers
 	h := handler.Group("/v1")
 	// 为api配置路由，创建api
-	v1.NewUserApi(h,ioc.Get[service.UserServiceImpl]())
+	v1.NewUserApi(h, ioc.Get[service.UserServiceImpl]())
 }

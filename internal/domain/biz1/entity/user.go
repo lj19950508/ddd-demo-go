@@ -8,3 +8,5 @@ type User struct {
 func NewUser(Id int, name string) *User {
 	return &User{Id: Id, Name: name}
 }
+
+//具体业务数据操作

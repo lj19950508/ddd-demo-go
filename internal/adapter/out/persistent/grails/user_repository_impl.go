@@ -19,16 +19,16 @@ func NewUserRepositoryImpl(mysql *mysql.Mysql) repository.UserRepository {
 }
 
 func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
+	//获取单挑po 
 	userPo := pojo.NewUserPO()
 
 	result := t.GormDb.First(&userPo, id)
+	//处理数据库异常
 	if result.Error != nil {
 		return nil, errors.WithStack(result.Error)
 	}
-
+	//把po->domain
 	domainUser := entity.NewUser(userPo.Id, userPo.Name)
-	// copier.Copy()
-	//拷贝userpo成entity.user
 	return domainUser, nil
 }
 

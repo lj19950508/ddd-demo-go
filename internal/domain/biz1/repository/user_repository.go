@@ -8,6 +8,6 @@ type UserRepository interface {
 	FindById(id int) (*entity.User, error)
 
 	//FindList() []*entity.User
-
+	
 	Save(user entity.User)
 }
