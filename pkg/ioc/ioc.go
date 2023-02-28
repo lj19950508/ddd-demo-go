@@ -16,13 +16,14 @@ func RegisterAll(data []any) {
 func Register(instance any) {
 	//instance必须为指针
 	if reflect.ValueOf(instance).Kind() != reflect.Pointer {
-		panic("必须是指针才能注册")
+		log.Fatalf("Cloud not register an object without pointer")
+
 	}
 
 	instanceType := reflect.TypeOf(instance)
 
 	if ioc[instanceType] != nil {
-		panic("已存在，请勿重复注册")
+		log.Fatalf("Could not register an exists object")
 	}
 	ioc[instanceType] = instance
 }
