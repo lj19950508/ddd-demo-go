@@ -1,12 +1,10 @@
 package grails
 
 import (
-	"errors"
-
 	"github.com/lj19950508/ddd-demo-go/internal/adapter/out/persistent/grails/po"
 	entity "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/entity"
 	repository "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/repository"
-
+	"github.com/pkg/errors"
 	// "github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/mysql"
@@ -30,19 +28,18 @@ func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		return nil,result.Error
+		return nil, errors.WithStack(result.Error)
 	}
 	//把po->domain
 	domainUser := entity.NewUser(userPo.ID, userPo.Name)
 	return domainUser, nil
 }
 
-
 //save -> void cqrs有点
 func (t *UserRepositoryImpl) Save(user *entity.User) error {
 	//do -> po
-	userPo := po.NewUserPO(5,"test")
-	
+	userPo := po.NewUserPO(5, "test")
+
 	if userPo.ID == 0 {
 		//需要返回user则加&
 		if result := t.GormDb.Create(userPo); result.Error != nil {
