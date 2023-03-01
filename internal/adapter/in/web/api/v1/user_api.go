@@ -28,8 +28,9 @@ func NewUserApi(handler *gin.RouterGroup, userService service.UserService) {
 func (t *UserApi) Info(ctx *gin.Context) {
 
 	//指责
+	//0. logger和ginloger 需要 spanId
 	//1.转换参数成dto
-	//2.打印参数(不知道能否logger实现) 出参 入参
+	//2.打印
 	//3.验证参数
 	//4.dto->domain
 	//5.domian->dto
