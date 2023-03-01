@@ -18,7 +18,7 @@ type Mysql struct {
 	Url string `env-required:"true" yaml:"url" env:"MYSQL_URL"`
 }
 
-//错误的处理凡事按这个
+//这么使用指针会造成值拷贝
 func NewConfig() (cfg *Config, err error) {
 	cfg = &Config{}
 

@@ -31,7 +31,7 @@ func Error(err error) (int, *dto.Result[any]) {
 	return 400, dto.NewResult[any](nil, bizCode, err.Error())
 }
 
-func ResultData(data any) (int, *dto.Result[any]) {
+func ResultData(data any) (int,*dto.Result[any]) {
 
 	return 200, dto.NewResult(data, 0, "")
 }

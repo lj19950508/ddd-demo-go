@@ -9,6 +9,9 @@ type User struct {
 	Name string
 }
 
-func NewUserPO() User {
-	return User{}
+func NewUserPO(ID uint,Name string) *User {
+	return &User{
+		ID: ID,
+		Name: Name,
+	}
 }
