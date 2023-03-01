@@ -1,9 +1,9 @@
 package v1
 
 import (
-	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api/wrapper"
 	"github.com/lj19950508/ddd-demo-go/internal/application/service"
 )
 
@@ -39,17 +39,29 @@ func (t *UserApi) Info(ctx *gin.Context) {
 	//TODO 8.ResultDTO
 
 	//abouterror
-	//如果是业务错误直接这么返回并打印堆栈没错（找不到数据库）， 如果是服务器错误也要打印堆栈吗
-	//如何区分业务错误和服务器错误   业务错误(状态不对,数据库没数据) 服务器错误(nil指针，数据库连接出错，)
-	//业务错误比如 状态不对 if status != 5 ，如何控制这个流程
-	// 结论  有error声明的都是业务错误， 没有被error识别的 会被panic recover 为服务器错误
+	//野生的异常会打印堆栈，已知的异常靠自己处理。频繁panic性能不好.
+	//自己处理异常 BizErrorHandler
+
+	// dealerr(ctx)
+	//
+	// var a *int
+
 	user, err := t.userService.Info(1)
 	if err != nil {
+		//HandlerError(err)
+		// return
 		//TODO if erroris .... 怎样怎样
 		//对err判断并处理
-		ctx.JSON(http.StatusBadRequest, err.Error())
+		// ctx.Status()
+		// ctx.JSON(http.StatusBadRequest, err.Error())
+		// httpCode,result := WrapperError(err)
+		// ctx.JSON(wrapper.WrapperError(err))
+
+		//如果是errorNotFind异常则要转换成业务异常。
+		ctx.JSON(wrapper.Error(err))
 		return
-	} 
-	ctx.JSON(http.StatusOK, user)
+	}
+
+	ctx.JSON(wrapper.ResultData(user))
 
 }
