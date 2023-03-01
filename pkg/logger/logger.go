@@ -21,7 +21,7 @@ type Logger struct {
 	logger *zerolog.Logger
 }
 
-var Instance Interface = (*Logger)(nil)
+// var Instance Interface = (*Logger)(nil)
 
 // New -.
 func New(level string) Interface {
@@ -44,10 +44,9 @@ func New(level string) Interface {
 
 	skipFrameCount := 3
 	logger := zerolog.New(os.Stdout).With().Timestamp().CallerWithSkipFrameCount(zerolog.CallerSkipFrameCount + skipFrameCount).Logger()
-	Instance = &Logger{
+	return &Logger{
 		logger: &logger,
 	}
-	return Instance
 }
 
 // Debug -.

@@ -18,7 +18,8 @@ func Run(cfg *config.Config) {
 	var err error
 
 	ioc.NewIOC()
-	logger.New(cfg.Log.Level)
+	logger :=logger.New(cfg.Log.Level)
+
 	//从下面开始可以使用 logger.Instance
 
 	//注册第三方插件的start
@@ -27,12 +28,12 @@ func Run(cfg *config.Config) {
 	mysql, err := mysql.New(cfg.Mysql.Url)
 	//if err
 	if err != nil {
-		logger.Instance.Fatal("%s", err)
+		logger.Fatal("%s", err)
 	}
 	defer mysql.Close()
 
 	//new一个ioc比较好
-	ioc.Register(mysql)
+	ioc.Register(logger,mysql)
 	wire()
 
 	//web服务  socket等 输入服务输入服务写在下面
@@ -50,15 +51,15 @@ func Run(cfg *config.Config) {
 	select {
 	case <-ctx.Done():
 		//ctrl c 会走到这
-		logger.Instance.Info("context done")
+		logger.Info("context done")
 	case err = <-httpServer.Notify():
-		logger.Instance.Error("httpServer.shutdown:%s", err)
+		logger.Error("httpServer.shutdown:%s", err)
 	}
 
 	err = httpServer.Shutdown()
 	if err != nil {
 		//关闭如果出错 则会走这
-		logger.Instance.Error("httpServer.shutdown:%w", err)
+		logger.Error("httpServer.shutdown:%w", err)
 	}
 }
 

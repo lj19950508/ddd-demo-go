@@ -8,6 +8,7 @@ import (
 	v1 "github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api/v1"
 	"github.com/lj19950508/ddd-demo-go/internal/application/service"
 	"github.com/lj19950508/ddd-demo-go/pkg/ioc"
+	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 )
 
 // NewRouter -.
@@ -29,5 +30,5 @@ func NewRouter(handler *gin.Engine) {
 	// Routers
 	h := handler.Group("/v1")
 	// 为api配置路由，创建api
-	v1.NewUserApi(h, ioc.Get[service.UserServiceImpl]())
+	v1.NewUserApi(h, ioc.Get[service.UserServiceImpl](),ioc.Get[logger.Logger]())
 }

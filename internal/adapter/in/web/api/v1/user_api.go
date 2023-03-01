@@ -1,18 +1,23 @@
 package v1
 
 import (
+	"context"
+
 	"github.com/gin-gonic/gin"
-	"github.com/lj19950508/ddd-demo-go/pkg/wrapper"
 	"github.com/lj19950508/ddd-demo-go/internal/application/service"
+	"github.com/lj19950508/ddd-demo-go/pkg/logger"
+	"github.com/lj19950508/ddd-demo-go/pkg/wrapper"
 )
 
 type UserApi struct {
 	userService service.UserService
+	logger *logger.Logger
 }
 
-func NewUserApi(handler *gin.RouterGroup, userService service.UserService) {
+func NewUserApi(handler *gin.RouterGroup, userService service.UserService,logger *logger.Logger) {
 	userApi := &UserApi{
 		userService: userService,
+		logger:logger,
 	}
 	routerGroup := handler.Group("/user")
 	{
@@ -26,6 +31,10 @@ func NewUserApi(handler *gin.RouterGroup, userService service.UserService) {
 }
 
 func (t *UserApi) Info(ctx *gin.Context) {
+	t.logger.Info("gogogo")
+	ctx.GetString("RequestTracingTraceId")
+	ctx.Set("RequestTracingTraceId","")
+	context.Background()
 
 	//指责
 	//0. logger和ginloger 需要 spanId
