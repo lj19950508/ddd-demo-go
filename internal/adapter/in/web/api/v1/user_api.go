@@ -45,7 +45,7 @@ func (t *UserApi) Info(ctx *gin.Context) {
 	//
 	// var a *int
 
-	user, err := t.userService.Info(1)
+	user, err := t.userService.Info(100)
 	if err != nil {
 		//HandlerError(err)
 		// return

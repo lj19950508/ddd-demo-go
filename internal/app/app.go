@@ -17,6 +17,7 @@ import (
 func Run(cfg *config.Config) {
 	var err error
 
+	ioc.NewIOC()
 	logger.New(cfg.Log.Level)
 	//从下面开始可以使用 logger.Instance
 
@@ -30,6 +31,7 @@ func Run(cfg *config.Config) {
 	}
 	defer mysql.Close()
 
+	//new一个ioc比较好
 	ioc.Register(mysql)
 	wire()
 
