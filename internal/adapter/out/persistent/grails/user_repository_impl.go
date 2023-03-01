@@ -6,7 +6,9 @@ import (
 	"github.com/lj19950508/ddd-demo-go/internal/adapter/out/persistent/grails/po"
 	entity "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/entity"
 	repository "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/repository"
+
 	// "github.com/lj19950508/ddd-demo-go/pkg/logger"
+	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/mysql"
 	"gorm.io/gorm"
 )
@@ -48,7 +50,7 @@ func (t *UserRepositoryImpl) Save(user entity.User) {
 	} else {
 		result := t.GormDb.Model(userPo).Updates(userPo)
 		if result.RowsAffected == 0 {
-			// logger.Instance.Warn("0 rows affected,%+v", userPo)
+			logger.Instance.Warn("0 rows affected,%+v", userPo)
 		}
 		if result.Error != nil {
 			panic(result.Error)

@@ -18,7 +18,7 @@ func Run(cfg *config.Config) {
 	var err error
 
 	ioc.NewIOC()
-	logger :=logger.New(cfg.Log.Level)
+	logger.Instance = logger.New(cfg.Log.Level)
 
 	//从下面开始可以使用 logger.Instance
 
@@ -28,18 +28,20 @@ func Run(cfg *config.Config) {
 	mysql, err := mysql.New(cfg.Mysql.Url)
 	//if err
 	if err != nil {
-		logger.Fatal("%s", err)
+		logger.Instance.Fatal("%s", err)
 	}
 	defer mysql.Close()
 
-	//new一个ioc比较好
-	ioc.Register(logger,mysql)
+	ioc.Register(mysql)
+	logger.Instance.Info("compoents register finish")
 	wire()
-
+	logger.Instance.Info("compoents wire finish")
 	//web服务  socket等 输入服务输入服务写在下面
+	gin.SetMode(gin.ReleaseMode)
 	handle := gin.New()
 	api.NewRouter(handle)
 	httpServer := httpserver.New(handle, httpserver.Port(cfg.Port))
+	logger.Instance.Info("httpserver start on %s", cfg.Port)
 
 	//监听信号
 	// interrup t := make(chan os.Signal, 1)
@@ -51,15 +53,16 @@ func Run(cfg *config.Config) {
 	select {
 	case <-ctx.Done():
 		//ctrl c 会走到这
-		logger.Info("context done")
+		logger.Instance.Info("context done")
 	case err = <-httpServer.Notify():
-		logger.Error("httpServer.shutdown:%s", err)
+		//当端口重复可能
+		logger.Instance.Error("httpServer.shutdown:%s", err)
 	}
 
 	err = httpServer.Shutdown()
 	if err != nil {
 		//关闭如果出错 则会走这
-		logger.Error("httpServer.shutdown:%w", err)
+		logger.Instance.Error("httpServer.shutdown:%w", err)
 	}
 }
 

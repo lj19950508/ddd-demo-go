@@ -7,6 +7,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
+var Instance Interface
+
 // 统一日志接口，不管什么日志框架都符合这个规范
 type Interface interface {
 	Debug(message string, args ...interface{})
@@ -42,7 +44,8 @@ func New(level string) Interface {
 	}
 	zerolog.SetGlobalLevel(l)
 
-	skipFrameCount := 3
+	//在默认跳过2帧stack的情况下 基于logger本身框架再跳一层
+	skipFrameCount := 1
 	logger := zerolog.New(os.Stdout).With().Timestamp().CallerWithSkipFrameCount(zerolog.CallerSkipFrameCount + skipFrameCount).Logger()
 	return &Logger{
 		logger: &logger,

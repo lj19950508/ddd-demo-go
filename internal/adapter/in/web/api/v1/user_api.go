@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"context"
-
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/internal/application/service"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
@@ -11,13 +9,11 @@ import (
 
 type UserApi struct {
 	userService service.UserService
-	logger *logger.Logger
 }
 
-func NewUserApi(handler *gin.RouterGroup, userService service.UserService,logger *logger.Logger) {
+func NewUserApi(handler *gin.RouterGroup, userService service.UserService) {
 	userApi := &UserApi{
 		userService: userService,
-		logger:logger,
 	}
 	routerGroup := handler.Group("/user")
 	{
@@ -31,10 +27,9 @@ func NewUserApi(handler *gin.RouterGroup, userService service.UserService,logger
 }
 
 func (t *UserApi) Info(ctx *gin.Context) {
-	t.logger.Info("gogogo")
+	logger.Instance.Info("start")
 	ctx.GetString("RequestTracingTraceId")
-	ctx.Set("RequestTracingTraceId","")
-	context.Background()
+	ctx.Set("RequestTracingTraceId", "")
 
 	//指责
 	//0. logger和ginloger 需要 spanId
@@ -68,9 +63,11 @@ func (t *UserApi) Info(ctx *gin.Context) {
 
 		//如果是errorNotFind异常则要转换成业务异常。
 		ctx.JSON(wrapper.Error(err))
+		logger.Instance.Info("end")
 		return
 	}
 
+	logger.Instance.Info("end")
 	ctx.JSON(wrapper.ResultData(user))
 
 }
