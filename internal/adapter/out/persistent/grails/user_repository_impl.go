@@ -23,8 +23,8 @@ func NewUserRepositoryImpl(mysql *mysql.Mysql) repository.UserRepository {
 
 func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
 	//获取单挑po、
-	var userPo *po.User
-	if result := t.GormDb.First(userPo, id); result.Error != nil {
+	var userPo po.User
+	if result := t.GormDb.First(&userPo, id); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, result.Error
 		}

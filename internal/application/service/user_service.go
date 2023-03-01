@@ -3,7 +3,7 @@ package service
 import (
 	entity "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/entity"
 	repository "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/repository"
-	"github.com/lj19950508/ddd-demo-go/pkg"
+	"github.com/lj19950508/ddd-demo-go/pkg/errors"
 )
 
 type UserService interface {

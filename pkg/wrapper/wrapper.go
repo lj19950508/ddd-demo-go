@@ -2,7 +2,7 @@ package wrapper
 
 
 import (
-	"github.com/lj19950508/ddd-demo-go/pkg"
+	"github.com/lj19950508/ddd-demo-go/pkg/errors"
 	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/dto"
 )
 
