@@ -28,24 +28,25 @@ func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
 	var userPo po.User
 	if result := t.GormDb.First(&userPo, id); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, result.Error
+			return nil, nil
 		}
-		//意料之中这么写
-		panic(result.Error)
+		return nil,result.Error
 	}
 	//把po->domain
 	domainUser := entity.NewUser(userPo.ID, userPo.Name)
 	return domainUser, nil
 }
 
-func (t *UserRepositoryImpl) Save(user entity.User) {
+
+//save -> void cqrs有点
+func (t *UserRepositoryImpl) Save(user *entity.User) error {
 	//do -> po
 	userPo := po.NewUserPO(5,"test")
 	
 	if userPo.ID == 0 {
 		//需要返回user则加&
 		if result := t.GormDb.Create(userPo); result.Error != nil {
-			panic(result.Error)
+			return result.Error
 		}
 	} else {
 		result := t.GormDb.Model(userPo).Updates(userPo)
@@ -53,7 +54,8 @@ func (t *UserRepositoryImpl) Save(user entity.User) {
 			logger.Instance.Warn("0 rows affected,%+v", userPo)
 		}
 		if result.Error != nil {
-			panic(result.Error)
+			return result.Error
 		}
 	}
+	return nil
 }

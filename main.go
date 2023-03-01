@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/internal/app"
@@ -13,8 +13,7 @@ func main() {
 	//现有 config 再有 zerolog ，所以这里不能使用 zerolog，但是 是否要使用 log 或者直接panic呢 ,决定使用
 
 	if err != nil {
-		panic(fmt.Sprintf("%+v", err))
-
+		log.Fatalf("%+v", err)
 		//这么打才能打印出堆栈信息
 		// %v在打印接口类型时，会打印出其实际的值。而在打印结构体对象时，打印的是结构体成员对象的值。
 		// %+v打印结构体对象中的字段类型+字段值。

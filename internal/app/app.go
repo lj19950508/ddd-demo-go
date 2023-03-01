@@ -17,7 +17,6 @@ import (
 func Run(cfg *config.Config) {
 	var err error
 
-	ioc.NewIOC()
 	logger.Instance = logger.New(cfg.Log.Level)
 
 	//从下面开始可以使用 logger.Instance
@@ -40,8 +39,8 @@ func Run(cfg *config.Config) {
 	gin.SetMode(gin.ReleaseMode)
 	handle := gin.New()
 	api.NewRouter(handle)
-	httpServer := httpserver.New(handle, httpserver.Port(cfg.Port))
 	logger.Instance.Info("httpserver start on %s", cfg.Port)
+	httpServer := httpserver.New(handle, httpserver.Port(cfg.Port))
 
 	//监听信号
 	// interrup t := make(chan os.Signal, 1)

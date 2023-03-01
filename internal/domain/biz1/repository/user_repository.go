@@ -9,5 +9,5 @@ type UserRepository interface {
 
 	//FindList() []*entity.User
 	
-	Save(user entity.User)
+	Save(user *entity.User) error
 }

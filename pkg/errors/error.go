@@ -5,6 +5,13 @@ import "errors"
 
 //只存在业务错误  err->bizCode
 // i18n错误
+
+
+var (
+	BizCodeNormal = 0
+	BizCodeError  =-1
+)
+
 var (
 	ErrOrderStatusError = errors.New("order status error")
 )
