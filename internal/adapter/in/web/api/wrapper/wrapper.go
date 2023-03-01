@@ -1,6 +1,8 @@
 package wrapper
 
+
 import (
+	"github.com/lj19950508/ddd-demo-go/pkg"
 	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/dto"
 )
 
@@ -14,7 +16,7 @@ func Error(err error) (int, *dto.Result[any]) {
 	// ErrInvalidTransaction = errors.New("invalid transaction")
 	//预料之外的都是500
 	//for erroris  return  ,, default reutrn -1,-1  (没有注册该异常)
-	bizCode := searchErr(err)
+	bizCode := pkg.SearchErr(err)
 	if bizCode == -1 {
 		//野生异常 直接被panic处理了
 		//自己创造出来的异常，或者第三方库生成的异常可以搜集到，如果是第三方库的异常 要在生成的时候去根据情况处理,如果是自己创造出来的异常则不用管直接panic
@@ -26,7 +28,7 @@ func Error(err error) (int, *dto.Result[any]) {
 
 	}
 
-	return 400, dto.NewResult[any](nil, bizCode, "")
+	return 400, dto.NewResult[any](nil, bizCode, err.Error())
 }
 
 func ResultData(data any) (int, *dto.Result[any]) {

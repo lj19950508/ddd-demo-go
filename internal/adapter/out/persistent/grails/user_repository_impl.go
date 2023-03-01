@@ -22,19 +22,21 @@ func NewUserRepositoryImpl(mysql *mysql.Mysql) repository.UserRepository {
 }
 
 func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
-	//获取单挑po、
+	//获取单挑po、	
 	userPo := po.NewUserPO()
 	if result := t.GormDb.First(&userPo, id); result.Error != nil {
-		//意料之中这么写
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, result.Error
 		}
-		//意料之外这么写
+		//意料之中这么写
 		panic(result.Error)
+
+
+		//意料之外这么写
 	}
 	//把po->domain
 	domainUser := entity.NewUser(userPo.ID, userPo.Name)
-	return domainUser, nil
+	return &domainUser, nil
 }
 
 func (t *UserRepositoryImpl) Save(user entity.User) {
@@ -48,16 +50,11 @@ func (t *UserRepositoryImpl) Save(user entity.User) {
 		}
 	} else {
 		result := t.GormDb.Model(&userPo).Updates(userPo)
-		if(result.RowsAffected==0){
-			logger.Instance.Warn("0 rows affected,%+v",userPo)
+		if result.RowsAffected == 0 {
+			logger.Instance.Warn("0 rows affected,%+v", userPo)
 		}
-		if(result.Error!=nil){
+		if result.Error != nil {
 			panic(result.Error)
 		}
 	}
-	//save会更新0值
-	//有id就去update 没id去救save
-	//save就是save吗
-	//如果有id就。。
-
 }

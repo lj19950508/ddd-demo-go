@@ -1,26 +1,20 @@
-package wrapper
+package pkg
 
 import "errors"
 
-// import "net/http"
-
-//i18n 
-
-// msg
-
-// err
 
 //只存在业务错误  err->bizCode
+// i18n错误
 var (
-	ErrVar = errors.New("testBizError")
+	ErrOrderStatusError = errors.New("order status error")
 )
 
 var bizErrorMap = map[error]int{
-	ErrVar: 1,
+	ErrOrderStatusError: 1,
 }
 
-func searchErr(err error) int {
-	for target, bizCode := range bizErrorMap {
+func SearchErr(err error) int {
+	for target, bizCode := range bizErrorMap {		
 		if errors.Is(err, target) {
 			return bizCode
 		}

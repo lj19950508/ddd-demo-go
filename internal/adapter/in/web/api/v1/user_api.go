@@ -1,7 +1,6 @@
 package v1
 
 import (
-
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api/wrapper"
 	"github.com/lj19950508/ddd-demo-go/internal/application/service"
@@ -46,7 +45,7 @@ func (t *UserApi) Info(ctx *gin.Context) {
 	//
 	// var a *int
 
-	user, err := t.userService.Info(1)
+	user, err := t.userService.Info(100)
 	if err != nil {
 		//HandlerError(err)
 		// return

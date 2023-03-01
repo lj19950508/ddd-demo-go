@@ -5,8 +5,8 @@ type User struct {
 	Name string
 }
 
-func NewUser(Id uint, name string) *User {
-	return &User{Id: Id, Name: name}
+func NewUser(Id uint, name string) User {
+	return User{Id: Id, Name: name}
 }
 
 //具体业务数据操作
