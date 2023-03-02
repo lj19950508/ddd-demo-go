@@ -54,10 +54,15 @@ func (s *Server) start() {
 	}()
 }
 
+//chan是error类型，（从隧道流出到变量里）
 // Notify -.
 func (s *Server) Notify() <-chan error {
 	return s.notify
 }
+// 从变量传入数据到channel （返回一个可传入的error）
+// func (s *Server) Siri() chan<- error {
+// 	return s.notify
+// }
 
 // Shutdown -.
 func (s *Server) Shutdown() error {
