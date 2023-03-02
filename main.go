@@ -1,33 +1,94 @@
 package main
 
 import (
-	"log"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/config"
-	"github.com/lj19950508/ddd-demo-go/internal/app"
+	v1 "github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api/v1"
+	"github.com/lj19950508/ddd-demo-go/internal/adapter/out/persistent/grails"
+	"github.com/lj19950508/ddd-demo-go/internal/application/service"
+	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
+	"github.com/lj19950508/ddd-demo-go/pkg/logger"
+	"github.com/lj19950508/ddd-demo-go/pkg/mysql"
+	"go.uber.org/fx"
 )
 
+
 func main() {
-
-	cfg, err := config.NewConfig()
-	//现有 config 再有 zerolog ，所以这里不能使用 zerolog，但是 是否要使用 log 或者直接panic呢 ,决定使用
-
-	if err != nil {
-		log.Fatalf("%+v", err)
-		//这么打才能打印出堆栈信息
-		// %v在打印接口类型时，会打印出其实际的值。而在打印结构体对象时，打印的是结构体成员对象的值。
-		// %+v打印结构体对象中的字段类型+字段值。
-		// %#v先打印结构体名，再输出结构体对象的字段类型+字段的值。
-		// %T 值的类型
-		// %% 百分号
-		// %d  %s
-		// %t bool
-		// %b 二进制 %c unicode %d 十进制 %o b八进制  %x(X)  16进制
-		// %e 科学计数法 E
-		// %f float
-		// %w wrappererror ，错误叠加
-
-		//这个就是 log+ exits  也就是 panic的意思 ， 但是panic会被 recover
-	}
-	app.Run(cfg)
+	fx := fx.New(
+		option()...,
+	)
+	fx.Run()
 }
+
+func option() []fx.Option {
+	options := []fx.Option{}
+	options = append(options, repositorys()...)
+	options = append(options, services()...)
+	options = append(options, apis()...)
+	options = append(options, base()...)
+	// options = append(options, routers()...)
+	return options
+}
+
+func base() []fx.Option {
+	return []fx.Option{
+		
+		fx.Provide(config.New),
+		fx.Provide(logger.New),
+		fx.Provide(mysql.New),
+		fx.Provide(httpserver.New),
+		//handler
+		fx.Provide(func (userApi *v1.UserApi,cfg *config.Config) http.Handler {
+			gin.SetMode(gin.ReleaseMode)
+			handler := gin.New()
+			handler.Use(gin.Recovery())
+			handler.Use(gin.Logger())
+
+			//  httpserver ->handler(gin) -> router-> apipi... 
+			// gin.HandlerFunc
+			
+			// handler.Group("user",)
+			// handler.Use(userApi.Router())
+			// [GET,]
+			// handler.Hand()
+			// handler.Handlers = append(handler.Handlers)
+			// handler.Handle("httpmethod","/url","handle")
+			// handler.Group(userApi.Router())
+			// handler
+			userRouter:=handler.Group("/users")
+			userRouter.GET("/:id",userApi.Info)
+			return handler
+		}),
+
+		//依赖的末端
+		fx.Invoke(func(*httpserver.Server) {}),
+
+	}
+}
+
+// func routers() []fx.Option {
+// 	return []fx.Option{
+// 		fx.Provide(v1.NewUserRouter),
+// 	}
+// }
+func apis() []fx.Option {
+	return []fx.Option{
+		fx.Provide(v1.NewUserApi),
+	}
+}
+
+func services() []fx.Option {
+	return []fx.Option{
+		fx.Provide(service.NewUserServiceImpl),
+	}
+}
+
+func repositorys() []fx.Option {
+	return []fx.Option{
+		fx.Provide(grails.NewUserRepositoryImpl),
+	}
+}
+
+

@@ -1,7 +1,11 @@
 package config
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/ilyakaznacheev/cleanenv"
+	"go.uber.org/fx"
 )
 
 type Config struct {
@@ -19,16 +23,25 @@ type Mysql struct {
 }
 
 //这么使用指针会造成值拷贝
-func NewConfig() (cfg *Config, err error) {
+func New(lc fx.Lifecycle) (cfg *Config) {
 	cfg = &Config{}
-
-	err = cleanenv.ReadConfig("config/config.yml", cfg)
-	if err != nil {
-		return
-	}
-	err = cleanenv.ReadEnv(cfg)
-	if err != nil {
-		return
-	}
-	return cfg, nil
+	lc.Append(fx.Hook{
+		//被需要的时候只会执行一次
+		OnStart: func(ctx context.Context) error {
+			fmt.Println("start")
+			if err := cleanenv.ReadConfig("config/config.yml", cfg); err != nil {
+				return err
+			}
+			if err := cleanenv.ReadEnv(cfg); err != nil {
+				return err
+			}
+			return nil
+			// return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			fmt.Println("stop-------")
+			return nil
+		},
+	})
+	return cfg
 }

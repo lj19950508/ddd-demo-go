@@ -13,15 +13,18 @@ import (
 
 type UserRepositoryImpl struct {
 	*mysql.Mysql
+	logger.Interface
 }
 
-func NewUserRepositoryImpl(mysql *mysql.Mysql) repository.UserRepository {
+func NewUserRepositoryImpl(mysql *mysql.Mysql,logger logger.Interface) repository.UserRepository {
 	return &UserRepositoryImpl{
 		mysql,
+		logger,
 	}
 }
 
 func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
+	
 	//获取单挑po、
 	var userPo po.User
 	if result := t.GormDb.First(&userPo, id); result.Error != nil {
@@ -48,7 +51,7 @@ func (t *UserRepositoryImpl) Save(user *entity.User) error {
 	} else {
 		result := t.GormDb.Model(userPo).Updates(userPo)
 		if result.RowsAffected == 0 {
-			logger.Instance.Warn("0 rows affected,%+v", userPo)
+			t.Warn("0 rows affected,%+v", userPo)
 		}
 		if result.Error != nil {
 			return result.Error

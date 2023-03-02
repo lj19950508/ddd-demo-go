@@ -4,10 +4,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/rs/zerolog"
 )
-
-var Instance Interface
 
 // 统一日志接口，不管什么日志框架都符合这个规范
 type Interface interface {
@@ -26,11 +25,12 @@ type Logger struct {
 // var Instance Interface = (*Logger)(nil)
 
 // New -.
-func New(level string) Interface {
+//cfg如何抽象出来
+func New(cfg *config.Config) Interface {
 	var l zerolog.Level
 
 	//日志级别控制
-	switch strings.ToLower(level) {
+	switch strings.ToLower(cfg.Log.Level) {
 	case "error":
 		l = zerolog.ErrorLevel
 	case "warn":
@@ -75,25 +75,5 @@ func (l *Logger) Error(message string, args ...interface{}) {
 // Fatal -.
 func (l *Logger) Fatal(message string, args ...interface{}) {
 	l.logger.Fatal().Msgf(message, args...)
-	//执行玩需要关闭系统 但是zerolog已经实现
-	// os.Exit(1)
 }
 
-// func (l *Logger) log(message string, args ...interface{}) {
-// 	if len(args) == 0 {
-// 		l.logger.Info().Msg(message)
-// 	} else {
-// 		l.logger.Info().Msgf(message, args...)
-// 	}
-// }
-
-// func (l *Logger) msg(level string, message interface{}, args ...interface{}) {
-// 	switch msg := message.(type) {
-// 	case error:
-// 		l.log(msg.Error(), args...)
-// 	case string:
-// 		l.log(msg, args...)
-// 	default:
-// 		l.log(fmt.Sprintf("%s message %v has unknown type %v", level, message, msg), args...)
-// 	}
-// }

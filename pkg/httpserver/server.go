@@ -3,8 +3,12 @@ package httpserver
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"time"
+
+	"github.com/lj19950508/ddd-demo-go/config"
+	"go.uber.org/fx"
 )
       
 
@@ -23,26 +27,31 @@ type Server struct {
 }
 
 // New -.
-func New(handler http.Handler, opts ...Option) *Server {
+func New(lc fx.Lifecycle,cfg *config.Config,handler http.Handler) *Server {
 	httpServer := &http.Server{
 		Handler:      handler,
 		ReadTimeout:  _defaultReadTimeout,
 		WriteTimeout: _defaultWriteTimeout,
 		Addr:         _defaultAddr,
 	}
+	
 
 	s := &Server{
 		server:          httpServer,
 		notify:          make(chan error, 1),
 		shutdownTimeout: _defaultShutdownTimeout,
 	}
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			s.start()
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			s.Shutdown()
+			return nil
+		},
+	})
 
-	// Custom options
-	for _, opt := range opts {
-		opt(s)
-	}
-
-	s.start()
 
 	return s
 }
