@@ -2,6 +2,7 @@ package mysql
 
 import "time"
 
+//TODO 优化config option
 // Option -.
 type Option func(*Mysql)
 

@@ -41,24 +41,18 @@ func base() []fx.Option {
 		fx.Provide(httpserver.New),
 		//handler
 		fx.Provide(func (userApi *v1.UserApi,cfg *config.Config) http.Handler {
-			gin.SetMode(gin.ReleaseMode)
+			gin.SetMode(gin.DebugMode)
 			handler := gin.New()
 			handler.Use(gin.Recovery())
 			handler.Use(gin.Logger())
 
-			//  httpserver ->handler(gin) -> router-> apipi... 
-			// gin.HandlerFunc
-			
-			// handler.Group("user",)
-			// handler.Use(userApi.Router())
-			// [GET,]
-			// handler.Hand()
-			// handler.Handlers = append(handler.Handlers)
-			// handler.Handle("httpmethod","/url","handle")
-			// handler.Group(userApi.Router())
-			// handler
-			userRouter:=handler.Group("/users")
-			userRouter.GET("/:id",userApi.Info)
+			//TODO这里优化一下
+			// Register(userApi)
+			// Register()
+			// Register()
+			for _,v := range userApi.Router() {
+				handler.Handle(v.Method,v.Path,v.Handle)
+			}
 			return handler
 		}),
 

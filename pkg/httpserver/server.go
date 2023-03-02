@@ -3,7 +3,6 @@ package httpserver
 
 import (
 	"context"
-	"net"
 	"net/http"
 	"time"
 
@@ -35,12 +34,16 @@ func New(lc fx.Lifecycle,cfg *config.Config,handler http.Handler) *Server {
 		Addr:         _defaultAddr,
 	}
 	
-
 	s := &Server{
 		server:          httpServer,
 		notify:          make(chan error, 1),
 		shutdownTimeout: _defaultShutdownTimeout,
 	}
+
+	// for _, opt := range opts {
+	// 	opt(s)
+	// }
+
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			s.start()

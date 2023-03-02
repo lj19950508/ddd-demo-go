@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api/v1/dto"
 	"github.com/lj19950508/ddd-demo-go/internal/application/service"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/wrapper"
@@ -15,6 +16,13 @@ type UserApi struct {
 	logger logger.Interface
 }
 
+func (t *UserApi)Router()[]dto.RouterInfo{
+	return []dto.RouterInfo{
+		{Method:"GET",Path: "/v1/users/:id",Handle: t.Info},
+	}
+}
+
+
 func NewUserApi(userService service.UserService,logger logger.Interface) *UserApi {
 	return &UserApi{
 		userService: userService,
@@ -22,14 +30,7 @@ func NewUserApi(userService service.UserService,logger logger.Interface) *UserAp
 	}
 }
 
-func (t *UserApi) Router() *gin.RouterGroup{
-	group:= &gin.RouterGroup{}
-	group.Group("/user")
-	{
-		group.GET("/info/:id", t.Info)
-	}
-	return group
-}
+
 
 func (t *UserApi) Info(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
