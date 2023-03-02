@@ -1,8 +1,11 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 	"strings"
+	"time"
+
 	"github.com/rs/zerolog"
 )
 
@@ -43,8 +46,26 @@ func New(level string) Interface {
 	zerolog.SetGlobalLevel(l)
 
 	//在默认跳过2帧stack的情况下 基于logger本身框架再跳一层
-	skipFrameCount := 1
-	logger := zerolog.New(os.Stdout).With().Timestamp().CallerWithSkipFrameCount(zerolog.CallerSkipFrameCount + skipFrameCount).Logger()
+	// skipFrameCount := 1
+	// CallerWithSkipFrameCount(zerolog.CallerSkipFrameCount + skipFrameCount)
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+	output.FormatTimestamp=func(i interface{}) string {
+		return fmt.Sprintf("[DDD] %s",i)
+	}
+	output.FormatLevel = func(i interface{}) string {
+		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
+	}
+
+	output.FormatMessage = func(i interface{}) string {
+		return fmt.Sprintf("%s", i)
+	}
+	output.FormatFieldName = func(i interface{}) string {
+		return fmt.Sprintf("%s:", i)
+	}
+	output.FormatFieldValue = func(i interface{}) string {
+		return fmt.Sprintf("%s:", i)
+	}
+	logger := zerolog.New(output).With().Timestamp().Logger()
 	return &Logger{
 		logger: &logger,
 	}

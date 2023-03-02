@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -91,7 +92,24 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 	gin.SetMode(gin.ReleaseMode)
 	handler := gin.New()
 	handler.Use(gin.Recovery())
-	handler.Use(gin.Logger())
+	//TODO 整理日志， 如何输出线程ID ，  mysql日志 改成一行 ，如何格式化错误哦
+	//[][ACCESS]
+	//[ACCESS]-[REQID]-[TIME]-[LEVEL]-[MSG]
+	//[ACCESS]-[REQID]-[TIME]-[LEVEL]-[MSG]
+	//[]
+	handler.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		return fmt.Sprintf("[REQ] %s | %-6s| %s | %s | %d %s  %s\n",
+				param.TimeStamp.Format(time.RFC3339),
+				param.Method,
+				param.ClientIP,
+				// param.Request.UserAgent(),
+				param.Path,
+				// param.Request.Proto,
+				param.StatusCode,
+				param.Latency,
+				param.ErrorMessage,
+		)
+	}))
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 
 	for _, routerGroup := range routers {
@@ -139,7 +157,6 @@ var httpServerProvider = func(lc fx.Lifecycle, cfg *config.Config, handler http.
 var dbProvider = func(lc fx.Lifecycle, cfg *config.Config, logger logger.Interface) *db.DB {
 	db := db.New(cfg.Mysql.Url, db.MaxIdleConns(10), db.MaxOpenConns(100), db.ConnMaxLifetime(time.Hour))
 	lc.Append(fx.Hook{
-		//被需要的时候只会执行一次
 		OnStart: func(ctx context.Context) error {
 			if err := db.Open(); err != nil {
 				return err
@@ -159,10 +176,8 @@ var dbProvider = func(lc fx.Lifecycle, cfg *config.Config, logger logger.Interfa
 	return db
 }
 
-//httpserverProvider
 
 var loggerProvider = func(cfg *config.Config) logger.Interface {
 	return logger.New(cfg.Log.Level)
 }
 
-//就在main层 声明Provid

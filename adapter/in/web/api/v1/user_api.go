@@ -39,7 +39,6 @@ func (t *UserApi) Info(c *gin.Context) {
 	t.logger.Info("[访问用户信息-入参] id:%d", id)
 	user, err := t.userService.Info(id)
 	if err != nil {
-		//异常要不要输出堆栈的问题
 		t.logger.Info("[访问用户信息-错误] err:%s", err)
 		c.JSON(wrapper.Error(err))
 		return
