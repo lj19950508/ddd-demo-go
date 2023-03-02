@@ -62,9 +62,9 @@ func (s *Server) Notify() <-chan error {
 // }
 
 // Shutdown -.
-func (s *Server) Shutdown() error {
+func (s *Server) Shutdown(rootCtx context.Context) error {
 	//有没有办法等所有工作进程跑完再关闭。	
-	ctx, cancel := context.WithTimeout(context.Background(), s.shutdownTimeout)
+	ctx, cancel := context.WithTimeout(rootCtx, s.shutdownTimeout)
 	defer cancel()
 
 	return s.server.Shutdown(ctx)

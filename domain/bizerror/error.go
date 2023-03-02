@@ -1,4 +1,4 @@
-package pkg
+package bizerror
 
 import "errors"
 
@@ -8,11 +8,14 @@ import "errors"
 
 
 var (
+	//正常业务码
 	BizCodeNormal = 0
+	//找不到当前异常
 	BizCodeError  =-1
 )
 
 var (
+	//业务异常码
 	ErrOrderStatusError = errors.New("order status error")
 )
 

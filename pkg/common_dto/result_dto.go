@@ -13,3 +13,4 @@ func NewResult[T any](data T,bizCode int,msg string) *Result[T]{
 		Msg:msg,
 	}
 }
+

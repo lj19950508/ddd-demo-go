@@ -50,6 +50,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
+	github.com/bytedance/gopkg v0.0.0-20230224073017-0b6876860a2f
 	github.com/evrone/go-clean-template v1.4.2
 	github.com/google/uuid v1.3.0
 	github.com/jinzhu/copier v0.3.5

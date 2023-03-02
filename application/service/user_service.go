@@ -2,7 +2,7 @@ package service
 
 import (
 	user "github.com/lj19950508/ddd-demo-go/domain/user"
-	"github.com/lj19950508/ddd-demo-go/pkg/errors"
+	"github.com/lj19950508/ddd-demo-go/domain/bizerror"
 )
 
 type UserService interface {
@@ -26,7 +26,7 @@ func (t *UserServiceImpl) Info(id int) (*user.User, error) {
 	//4. 返回一个domain 
 	user,err := t.userRepository.FindById(id)
 	if(user==nil){
-		return nil,pkg.ErrOrderStatusError
+		return nil,bizerror.ErrOrderStatusError
 	}
 	return user,err
 }
