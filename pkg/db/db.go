@@ -1,4 +1,4 @@
-package mysql
+package db
 
 import (
 	"context"
@@ -6,10 +6,8 @@ import (
 	"log"
 	"os"
 	"time"
-
-	"github.com/lj19950508/ddd-demo-go/config"
 	"go.uber.org/fx"
-	driver "gorm.io/driver/mysql"
+	driver "gorm.io/driver/db"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -20,7 +18,7 @@ const (
 	_defaultConnMaxLifetime = time.Hour
 )
 
-type Mysql struct {
+type DB struct {
 	MaxIdleConns    int
 	MaxOpenConns    int
 	ConnMaxLifetime time.Duration
@@ -28,18 +26,24 @@ type Mysql struct {
 	SqlDb           *sql.DB
 }
 
-func New(lc fx.Lifecycle, cfg *config.Config) (mysql *Mysql) {
-	mysql = &Mysql{
+func New(opts ...Option) (db *DB) {
+	//TODO --
+	db = &DB{
 		MaxIdleConns:    _defaultMaxIdleConns,
 		MaxOpenConns:    _defaultMaxOpenConns,
 		ConnMaxLifetime: _defaultConnMaxLifetime,
 	}
+	for _, opt := range opts {
+		opt(db)
+	}
+	
+
 	lc.Append(fx.Hook{
 		//被需要的时候只会执行一次
 		OnStart: func(ctx context.Context) error {
 			gormDb, err := gorm.Open(
 				driver.New(driver.Config{
-					DSN: cfg.Mysql.Url,
+					DSN: cfgDB.Url,
 				}), &gorm.Config{
 					Logger: logger.New(
 						log.New(os.Stdout, "", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容——译者注）
@@ -54,25 +58,25 @@ func New(lc fx.Lifecycle, cfg *config.Config) (mysql *Mysql) {
 			if err != nil {
 				return err
 			}
-			mysql.GormDb = gormDb
+			db.GormDb = gormDb
 			sqlDB, err := gormDb.DB()
 			if err != nil {
 				return err
 			}
-			mysql.SqlDb = sqlDB
-			sqlDB.SetMaxIdleConns(mysql.MaxIdleConns)
-			sqlDB.SetMaxOpenConns(mysql.MaxOpenConns)
-			sqlDB.SetConnMaxLifetime(mysql.ConnMaxLifetime)
+			db.SqlDb = sqlDB
+			sqlDB.SetMaxIdleConns(db.MaxIdleConns)
+			sqlDB.SetMaxOpenConns(db.MaxOpenConns)
+			sqlDB.SetConnMaxLifetime(db.ConnMaxLifetime)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			mysql.SqlDb.Close()
+			db.SqlDb.Close()
 			return nil
 		},
 	})
-	return mysql
+	return db
 }
 
-func (mysql *Mysql) Close() {
-	mysql.SqlDb.Close()
+func (db  DB) Close() {
+	db.SqlDb.Close()
 }

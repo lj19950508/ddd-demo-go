@@ -5,9 +5,6 @@ import (
 	"context"
 	"net/http"
 	"time"
-
-	"github.com/lj19950508/ddd-demo-go/config"
-	"go.uber.org/fx"
 )
       
 
@@ -26,7 +23,7 @@ type Server struct {
 }
 
 // New -.
-func New(lc fx.Lifecycle,cfg *config.Config,handler http.Handler) *Server {
+func New(handler http.Handler,opts ...Option) *Server {
 	httpServer := &http.Server{
 		Handler:      handler,
 		ReadTimeout:  _defaultReadTimeout,
@@ -40,26 +37,14 @@ func New(lc fx.Lifecycle,cfg *config.Config,handler http.Handler) *Server {
 		shutdownTimeout: _defaultShutdownTimeout,
 	}
 
-	// for _, opt := range opts {
-	// 	opt(s)
-	// }
-
-	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			s.start()
-			return nil
-		},
-		OnStop: func(ctx context.Context) error {
-			s.Shutdown()
-			return nil
-		},
-	})
-
+	for _, opt := range opts {
+		opt(s)
+	}
 
 	return s
 }
 
-func (s *Server) start() {
+func (s *Server) Start() {
 	go func() {
 		s.notify <- s.server.ListenAndServe()
 		close(s.notify)

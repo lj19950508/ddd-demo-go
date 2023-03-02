@@ -3,8 +3,6 @@ package logger
 import (
 	"os"
 	"strings"
-
-	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/rs/zerolog"
 )
 
@@ -26,11 +24,11 @@ type Logger struct {
 
 // New -.
 //cfg如何抽象出来
-func New(cfg *config.Config) Interface {
+func New(level string) Interface {
 	var l zerolog.Level
 
 	//日志级别控制
-	switch strings.ToLower(cfg.Log.Level) {
+	switch strings.ToLower(level) {
 	case "error":
 		l = zerolog.ErrorLevel
 	case "warn":
