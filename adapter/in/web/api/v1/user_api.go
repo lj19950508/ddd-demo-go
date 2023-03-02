@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lj19950508/ddd-demo-go/adapter/in/web/api/v1/dto"
 	"github.com/lj19950508/ddd-demo-go/adapter/in/web/api/wrapper"
 	"github.com/lj19950508/ddd-demo-go/application/service"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
@@ -36,16 +37,15 @@ func (t *UserApi) Info(c *gin.Context) {
 		return
 	}
 	t.logger.Info("[访问用户信息-入参] id:%d", id)
-	// dto->domain
 	user, err := t.userService.Info(id)
-	//domain->dto 
 	if err != nil {
 		//异常要不要输出堆栈的问题
 		t.logger.Info("[访问用户信息-错误] err:%s", err)
 		c.JSON(wrapper.Error(err))
 		return
 	}
-	t.logger.Info("[访问用户信息-返回]:%+v", user)
-	c.JSON(http.StatusOK, wrapper.ResultData(user))
+	dto := dto.NewUser(user.Id,user.Name)
+	t.logger.Info("[访问用户信息-返回]:%+v", dto)
+	c.JSON(http.StatusOK, wrapper.ResultData(dto))
 
 }
