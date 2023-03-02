@@ -4,18 +4,19 @@ import (
 	"github.com/lj19950508/ddd-demo-go/adapter/out/persistent/grails/po"
 	user "github.com/lj19950508/ddd-demo-go/domain/user"
 	"github.com/pkg/errors"
+
 	// "github.com/lj19950508/ddd-demo-go/pkg/logger"
+	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
-	"github.com/lj19950508/ddd-demo-go/pkg/mysql"
 	"gorm.io/gorm"
 )
 
 type UserRepositoryImpl struct {
-	*mysql.Mysql
+	*db.DB
 	logger.Interface
 }
 
-func NewUserRepositoryImpl(mysql *mysql.Mysql,logger logger.Interface) user.UserRepository {
+func NewUserRepositoryImpl(mysql *db.DB,logger logger.Interface) user.UserRepository {
 	return &UserRepositoryImpl{
 		mysql,
 		logger,
