@@ -3,10 +3,10 @@ package main
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"github.com/lj19950508/ddd-demo-go/config"
 	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/web/api/v1"
 	"github.com/lj19950508/ddd-demo-go/adapter/out/persistent/grails"
 	"github.com/lj19950508/ddd-demo-go/application/service"
+	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/mysql"
