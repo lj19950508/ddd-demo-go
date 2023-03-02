@@ -64,7 +64,7 @@ func base() []fx.Option {
 		//TODO CONFIG 优化
 		fx.Provide(config.New),
 		fx.Provide(loggerProvider),
-		fx.Provide(mysql.New),
+		fx.Provide(db.New),
 		fx.Provide(httpServerProvider),
 		//handler
 		fx.Provide(httpHandlerProvider),
