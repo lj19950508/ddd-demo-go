@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api/v1/dto"
-	"github.com/lj19950508/ddd-demo-go/internal/application/service"
+	"github.com/lj19950508/ddd-demo-go/adapter/in/web/api/v1/dto"
+	"github.com/lj19950508/ddd-demo-go/application/service"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/wrapper"
 )

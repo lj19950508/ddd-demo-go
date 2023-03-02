@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/dto"
+	"github.com/lj19950508/ddd-demo-go/adapter/in/web/dto"
 	"github.com/lj19950508/ddd-demo-go/pkg/errors"
 )
 

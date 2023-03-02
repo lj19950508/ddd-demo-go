@@ -2,12 +2,11 @@ package main
 
 import (
 	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/config"
-	v1 "github.com/lj19950508/ddd-demo-go/internal/adapter/in/web/api/v1"
-	"github.com/lj19950508/ddd-demo-go/internal/adapter/out/persistent/grails"
-	"github.com/lj19950508/ddd-demo-go/internal/application/service"
+	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/web/api/v1"
+	"github.com/lj19950508/ddd-demo-go/adapter/out/persistent/grails"
+	"github.com/lj19950508/ddd-demo-go/application/service"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/mysql"
@@ -35,12 +34,14 @@ func option() []fx.Option {
 func base() []fx.Option {
 	return []fx.Option{
 		
+		//TODO CONFIG 优化
 		fx.Provide(config.New),
 		fx.Provide(logger.New),
 		fx.Provide(mysql.New),
 		fx.Provide(httpserver.New),
 		//handler
 		fx.Provide(func (userApi *v1.UserApi,cfg *config.Config) http.Handler {
+			//TODO youhua
 			gin.SetMode(gin.DebugMode)
 			handler := gin.New()
 			handler.Use(gin.Recovery())

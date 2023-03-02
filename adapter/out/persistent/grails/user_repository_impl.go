@@ -1,9 +1,8 @@
 package grails
 
 import (
-	"github.com/lj19950508/ddd-demo-go/internal/adapter/out/persistent/grails/po"
-	entity "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/entity"
-	repository "github.com/lj19950508/ddd-demo-go/internal/domain/biz1/repository"
+	"github.com/lj19950508/ddd-demo-go/adapter/out/persistent/grails/po"
+	user "github.com/lj19950508/ddd-demo-go/domain/user"
 	"github.com/pkg/errors"
 	// "github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
@@ -16,14 +15,14 @@ type UserRepositoryImpl struct {
 	logger.Interface
 }
 
-func NewUserRepositoryImpl(mysql *mysql.Mysql,logger logger.Interface) repository.UserRepository {
+func NewUserRepositoryImpl(mysql *mysql.Mysql,logger logger.Interface) user.UserRepository {
 	return &UserRepositoryImpl{
 		mysql,
 		logger,
 	}
 }
 
-func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
+func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
 	
 	//获取单挑po、
 	var userPo po.User
@@ -34,12 +33,12 @@ func (t *UserRepositoryImpl) FindById(id int) (*entity.User, error) {
 		return nil, errors.WithStack(result.Error)
 	}
 	//把po->domain
-	domainUser := entity.NewUser(userPo.ID, userPo.Name)
+	domainUser := user.NewUser(userPo.ID, userPo.Name)
 	return domainUser, nil
 }
 
 //save -> void cqrs有点
-func (t *UserRepositoryImpl) Save(user *entity.User) error {
+func (t *UserRepositoryImpl) Save(user *user.User) error {
 	//do -> po
 	userPo := po.NewUserPO(5, "test")
 
