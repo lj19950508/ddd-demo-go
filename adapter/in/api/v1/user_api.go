@@ -33,7 +33,7 @@ func NewUserApi(userService service.UserService, logger logger.Interface) *UserA
 func (t *UserApi) Info(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest,resultpkg.FailMsg(err.Error()))
+		c.JSON(http.StatusBadRequest,resultpkg.Fail(err.Error()))
 		return
 	}
 	t.logger.Info("[访问用户信息-入参] id:%d", id)
@@ -45,6 +45,6 @@ func (t *UserApi) Info(c *gin.Context) {
 	}
 	dto := dto.NewUser(user.Id,user.Name)
 	t.logger.Info("[访问用户信息-返回]:%+v", dto)
-	c.JSON(http.StatusOK, resultpkg.OkData(dto))
+	c.JSON(http.StatusOK, resultpkg.Ok(dto))
 
 }

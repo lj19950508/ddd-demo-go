@@ -27,8 +27,7 @@ var (
 	BizCodeError = -1
 )
 
-func OkData(data any) *Result {
-
+func Ok(data any) *Result {
 	return NewResult(data, BizCodeNormal, "")
 }
 
@@ -36,7 +35,7 @@ func OkMsg(msg string) *Result {
 	return NewResult(nil, BizCodeNormal, msg)
 }
 
-func FailMsg(msg string)* Result{
+func Fail(msg string)* Result{
 	return NewResult(nil, BizCodeError, msg)
 }
 
