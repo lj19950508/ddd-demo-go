@@ -58,7 +58,9 @@ func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
 //如传入  status 0 时， 会直接重置状态
 //由于我们结构体都使用 值而不是指针， 所以默认都是0,所以我们不进行重置 只更新非零值
 //所以 数据库中的0值字段都是无意义的，如果create完是0值，则update完 就没办法修改回0值了
-//在业务过程中不要使用零值  如状态0
+//在业务过程中不要使用零值  如状态0 字串空  bool值false(不使用bool值存数据库) float0   金额0
+//不太对不太对 要不要经过查询一次再save全部呢 ?
+//TODO 想法错了
 func (t *UserRepositoryImpl) Save(user *user.User) error {
 	//do -> po
 	userPo := NewUserPO(5, "test")
