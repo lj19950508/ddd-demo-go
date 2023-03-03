@@ -23,6 +23,7 @@ type Mysql struct {
 	Url string `env-required:"true" yaml:"url" env:"MYSQL_URL"`
 }
 
+//TODO 优化信道
 func New(lc fx.Lifecycle) (cfg *Config) {
 	cfg = &Config{}
 	if err := cleanenv.ReadConfig("config/config.yml", cfg); err != nil {
