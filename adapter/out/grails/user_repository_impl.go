@@ -52,32 +52,17 @@ func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
 	return domainUser, nil
 }
 
-//save -> void cqrs有点 //save不会忽略空值 所以用create和updates
-//db.save 即使是0值也会保存
-//db.update  db.update0值不更新  -
-//如传入  status 0 时， 会直接重置状态
-//由于我们结构体都使用 值而不是指针， 所以默认都是0,所以我们不进行重置 只更新非零值
-//所以 数据库中的0值字段都是无意义的，如果create完是0值，则update完 就没办法修改回0值了
-//在业务过程中不要使用零值  如状态0 字串空  bool值false(不使用bool值存数据库) float0   金额0
-//不太对不太对 要不要经过查询一次再save全部呢 ?
-//TODO 想法错了
 func (t *UserRepositoryImpl) Save(user *user.User) error {
+	//Fetch save 模型  Update都必须取回才能操作
 	//do -> po
 	userPo := NewUserPO(5, "test")
-
-	if userPo.ID == 0 {
-		//需要返回user则加&
-		if result := t.GormDb.Create(userPo); result.Error != nil {
-			return result.Error
-		}
-	} else {
-		result := t.GormDb.Model(userPo).Updates(userPo)
-		if result.RowsAffected == 0 {
-			t.Warn("0 rows affected,%+v", userPo)
-		}
-		if result.Error != nil {
-			return result.Error
-		}
+	//更具IDsave
+	result := t.GormDb.Save(user)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		t.Warn("0 rows affected,%+v", userPo)
 	}
 	return nil
 }
