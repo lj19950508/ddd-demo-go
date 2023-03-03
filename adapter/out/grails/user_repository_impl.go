@@ -1,7 +1,6 @@
 package grails
 
 import (
-	"github.com/lj19950508/ddd-demo-go/adapter/out/persistent/grails/po"
 	user "github.com/lj19950508/ddd-demo-go/domain/user"
 	"github.com/pkg/errors"
 
@@ -10,6 +9,22 @@ import (
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"gorm.io/gorm"
 )
+
+type User struct {
+	//可空得用指针
+	//非空用int
+	//ID主键
+	ID   uint
+	Name string
+}
+
+func NewUserPO(ID uint,Name string) *User {
+	return &User{
+		ID: ID,
+		Name: Name,
+	}
+}
+
 
 type UserRepositoryImpl struct {
 	*db.DB
@@ -26,7 +41,7 @@ func NewUserRepositoryImpl(mysql *db.DB,logger logger.Interface) user.UserReposi
 func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
 	
 	//获取单挑po、
-	var userPo po.User
+	var userPo User
 	if result := t.GormDb.First(&userPo, id); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -41,7 +56,7 @@ func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
 //save -> void cqrs有点
 func (t *UserRepositoryImpl) Save(user *user.User) error {
 	//do -> po
-	userPo := po.NewUserPO(5, "test")
+	userPo := NewUserPO(5, "test")
 
 	if userPo.ID == 0 {
 		//需要返回user则加&

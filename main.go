@@ -8,8 +8,8 @@ import (
 
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
-	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/web/api/v1"
-	"github.com/lj19950508/ddd-demo-go/adapter/out/persistent/grails"
+	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/api/v1"
+	"github.com/lj19950508/ddd-demo-go/adapter/out/grails"
 	"github.com/lj19950508/ddd-demo-go/application/service"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
