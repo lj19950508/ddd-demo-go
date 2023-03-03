@@ -1,4 +1,4 @@
-package dto
+package req
 
 
 // Id   uint  `binding:"required" form:"user" json:"user" xml:"user"  time_format:"2006-01-02"` `form:"colors[]"`

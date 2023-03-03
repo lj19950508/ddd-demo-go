@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"github.com/gin-gonic/gin"
-	"github.com/lj19950508/ddd-demo-go/adapter/in/api/v1/dto"
+	"github.com/lj19950508/ddd-demo-go/adapter/in/api/v1/res"
 	"github.com/lj19950508/ddd-demo-go/application/service"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
@@ -43,7 +43,7 @@ func (t *UserApi) Info(c *gin.Context) {
 		c.JSON(resultpkg.Error(err))
 		return
 	}
-	dto := dto.NewUser(user.Id,user.Name)
+	dto := res.NewUser(user.Id,user.Name)
 	t.logger.Info("[访问用户信息-返回]:%+v", dto)
 	c.JSON(http.StatusOK, resultpkg.Ok(dto))
 

@@ -1,4 +1,4 @@
-package dto
+package res
 
 
 // Name string `json:"name" time_format:"2006-01-02"`
