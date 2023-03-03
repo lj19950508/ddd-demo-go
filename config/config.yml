@@ -1,5 +1,5 @@
-port: 8080
-
+httpserver:
+  port: 8080
 logger:
   level: debug
 mysql:

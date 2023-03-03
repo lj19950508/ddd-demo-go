@@ -10,9 +10,13 @@ import (
 
 //分清哪些是必须 哪些可以默认
 type Config struct {
+	HttpServer HttpServer `yaml:"httpserver"`
+	Log Log   `yaml:"logger"`
+	Mysql Mysql `yaml:"mysql"`
+}
+
+type HttpServer struct{
 	Port  string `env-required:"true" yaml:"port"    env:"HTTP_PORT"`
-	Log   `yaml:"logger"`
-	Mysql `yaml:"mysql"`
 }
 
 type Log struct {
@@ -23,7 +27,6 @@ type Mysql struct {
 	Url string `env-required:"true" yaml:"url" env:"MYSQL_URL"`
 }
 
-//TODO 优化信道
 func New(lc fx.Lifecycle) (cfg *Config) {
 	cfg = &Config{}
 	if err := cleanenv.ReadConfig("config/config.yml", cfg); err != nil {

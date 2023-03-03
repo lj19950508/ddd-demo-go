@@ -92,11 +92,7 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 	gin.SetMode(gin.ReleaseMode)
 	handler := gin.New()
 	handler.Use(gin.Recovery())
-	//TODO 整理日志， 如何输出线程ID ，  mysql日志 改成一行 ，如何格式化错误哦
-	//[][ACCESS]
-	//[ACCESS]-[REQID]-[TIME]-[LEVEL]-[MSG]
-	//[ACCESS]-[REQID]-[TIME]-[LEVEL]-[MSG]
-	//[]
+
 	handler.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		return fmt.Sprintf("[REQ] %s | %-6s| %s | %s | %d %s  %s\n",
 				param.TimeStamp.Format(time.RFC3339),
@@ -121,7 +117,7 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 }
 
 var httpServerProvider = func(lc fx.Lifecycle, cfg *config.Config, handler http.Handler, logger logger.Interface, pool gopool.Pool) *httpserver.Server {
-	s := httpserver.New(handler, httpserver.Port(cfg.Port))
+	s := httpserver.New(handler, httpserver.Port(cfg.HttpServer.Port))
 
 	httpServerOnStart := func(ctx context.Context) error {
 		s.Start()
