@@ -3,7 +3,6 @@ package v1
 import (
 	"net/http"
 	"strconv"
-
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/adapter/in/web/api/v1/dto"
 	"github.com/lj19950508/ddd-demo-go/adapter/in/web/api/wrapper"
@@ -29,6 +28,7 @@ func NewUserApi(userService service.UserService, logger logger.Interface) *UserA
 		logger:      logger,
 	}
 }
+
 
 func (t *UserApi) Info(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))

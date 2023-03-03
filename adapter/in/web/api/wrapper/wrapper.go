@@ -16,27 +16,27 @@ import (
 // 	BizCodeNormal = errors.New("order status error")
 // )
 
-func Error(err error) (int, *dto.Result[any]) {
+func Error(err error) (int, *dto.Result) {
 	bizCode := bizerror.SearchErr(err)
 	if bizCode == bizerror.BizCodeError {
 		//这里是野生的异常，比如数据库错误等这些 ,这些会包装他的堆栈以便于追踪  (调用第三方库的第一层的错误要包装 如 repository的dberror)
-		return http.StatusInternalServerError, dto.NewResult[any](nil, bizCode, fmt.Sprintf("%+v", err))
+		return http.StatusInternalServerError, dto.NewResult(nil, bizCode, fmt.Sprintf("%+v", err))
 	}
 	//业务异常不包装堆栈
-	return http.StatusOK, dto.NewResult[any](nil, bizCode, err.Error())
+	return http.StatusOK, dto.NewResult(nil, bizCode, err.Error())
 }
 
-func ResultData(data any) *dto.Result[any] {
+func ResultData(data any) *dto.Result {
 
 	return dto.NewResult(data, bizerror.BizCodeNormal, "")
 }
 
-func ResultMsg(msg string) *dto.Result[any] {
+func ResultMsg(msg string) *dto.Result {
 
-	return dto.NewResult[any](nil, bizerror.BizCodeNormal, msg)
+	return dto.NewResult(nil, bizerror.BizCodeNormal, msg)
 }
 
-func Result(msg string, data any) *dto.Result[any] {
+func Result(msg string, data any) *dto.Result {
 
 	return dto.NewResult(data, bizerror.BizCodeNormal, "")
 }

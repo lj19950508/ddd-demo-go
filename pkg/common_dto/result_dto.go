@@ -1,13 +1,13 @@
 package dto
 
-type Result[T any] struct{
-	Data T `json:"data"`
+type Result struct{
+	Data any `json:"data"`
 	BizCode int `json:"bizCode"`
 	Msg string `json:"msg"`
 }
 
-func NewResult[T any](data T,bizCode int,msg string) *Result[T]{
-	return &Result[T]{
+func NewResult(data any,bizCode int,msg string) *Result{
+	return &Result{
 		Data:data,
 		BizCode: bizCode,
 		Msg:msg,
