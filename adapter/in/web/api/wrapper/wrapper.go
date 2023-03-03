@@ -26,6 +26,8 @@ func Error(err error) (int, *dto.Result) {
 	return http.StatusOK, dto.NewResult(nil, bizCode, err.Error())
 }
 
+//
+
 func ResultData(data any) *dto.Result {
 
 	return dto.NewResult(data, bizerror.BizCodeNormal, "")
