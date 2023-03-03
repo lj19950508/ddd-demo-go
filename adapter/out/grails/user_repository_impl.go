@@ -18,20 +18,19 @@ type User struct {
 	Name string
 }
 
-func NewUserPO(ID uint,Name string) *User {
+func NewUserPO(ID uint, Name string) *User {
 	return &User{
-		ID: ID,
+		ID:   ID,
 		Name: Name,
 	}
 }
-
 
 type UserRepositoryImpl struct {
 	*db.DB
 	logger.Interface
 }
 
-func NewUserRepositoryImpl(mysql *db.DB,logger logger.Interface) user.UserRepository {
+func NewUserRepositoryImpl(mysql *db.DB, logger logger.Interface) user.UserRepository {
 	return &UserRepositoryImpl{
 		mysql,
 		logger,
@@ -39,7 +38,7 @@ func NewUserRepositoryImpl(mysql *db.DB,logger logger.Interface) user.UserReposi
 }
 
 func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
-	
+
 	//获取单挑po、
 	var userPo User
 	if result := t.GormDb.First(&userPo, id); result.Error != nil {
@@ -53,7 +52,13 @@ func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
 	return domainUser, nil
 }
 
-//save -> void cqrs有点
+//save -> void cqrs有点 //save不会忽略空值 所以用create和updates
+//db.save 即使是0值也会保存
+//db.update  db.update0值不更新  -
+//如传入  status 0 时， 会直接重置状态
+//由于我们结构体都使用 值而不是指针， 所以默认都是0,所以我们不进行重置 只更新非零值
+//所以 数据库中的0值字段都是无意义的，如果create完是0值，则update完 就没办法修改回0值了
+//在业务过程中不要使用零值  如状态0
 func (t *UserRepositoryImpl) Save(user *user.User) error {
 	//do -> po
 	userPo := NewUserPO(5, "test")

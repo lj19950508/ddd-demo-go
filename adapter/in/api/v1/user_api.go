@@ -29,6 +29,13 @@ func NewUserApi(userService service.UserService, logger logger.Interface) *UserA
 	}
 }
 
+//Fetch Page
+
+//Create
+
+//Update
+
+//Excel GET
 
 func (t *UserApi) Info(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
