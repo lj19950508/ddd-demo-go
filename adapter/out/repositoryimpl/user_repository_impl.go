@@ -1,4 +1,4 @@
-package grails
+package repositoryimpl
 
 import (
 	"database/sql"

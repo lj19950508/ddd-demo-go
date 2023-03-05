@@ -9,8 +9,8 @@ import (
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
 	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/api/v1"
-	"github.com/lj19950508/ddd-demo-go/adapter/out/grails"
 	"github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl"
+	"github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
@@ -80,7 +80,7 @@ func cmdService() fx.Option {
 }
 
 func repositorys() fx.Option {
-	return fx.Provide(grails.NewUserRepositoryImpl)
+	return fx.Provide(repositoryimpl.NewUserRepositoryImpl)
 
 }
 

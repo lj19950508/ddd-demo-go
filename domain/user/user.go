@@ -28,7 +28,7 @@ type UserRepository interface {
 
 var (
 	//业务异常码
-	ErrUserDisabled = bizerror.NewBizError(100,"禁用用户")
+	errUserDisabled = bizerror.NewBizError(100,"禁用用户")
 )
 
 
@@ -40,4 +40,3 @@ type UserService struct{
 }
 
 
-//eventbus
