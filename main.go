@@ -9,8 +9,8 @@ import (
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
 	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/api/v1"
-	"github.com/lj19950508/ddd-demo-go/adapter/out"
 	"github.com/lj19950508/ddd-demo-go/adapter/out/grails"
+	"github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
@@ -39,7 +39,8 @@ func options() []fx.Option {
 	options = append(options, apis())
 	// service cqrs的体现  
 	// queryservice 注入 queryserviceimpl 注入  读库的 db,es,redis
-	options = append(options, services())
+	options = append(options, queryService())
+	options = append(options, cmdService())
 	// 仓储注入 writedb
 	options = append(options, repositorys())
 	// 初始化根层 如 httpservcer socketserver
@@ -70,9 +71,12 @@ func apis() fx.Option {
 
 }
 
-func services() fx.Option {
-	return fx.Provide(out.NewUserQueryServiceimpl)
+func queryService() fx.Option {
+	return fx.Provide(queryimpl.NewUserQueryServiceimpl)
+}
 
+func cmdService() fx.Option {
+	return fx.Provide(queryimpl.NewUserQueryServiceimpl)
 }
 
 func repositorys() fx.Option {
