@@ -9,8 +9,8 @@ import (
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
 	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/api/v1"
+	"github.com/lj19950508/ddd-demo-go/adapter/out"
 	"github.com/lj19950508/ddd-demo-go/adapter/out/grails"
-	"github.com/lj19950508/ddd-demo-go/application/service"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
@@ -33,10 +33,16 @@ func main() {
 
 func options() []fx.Option {
 	options := []fx.Option{}
+	// 基础实现层 如http mysql ，redis ，web
 	options = append(options, base())
+	// api接口
 	options = append(options, apis())
+	// service cqrs的体现  
+	// queryservice 注入 queryserviceimpl 注入  读库的 db,es,redis
 	options = append(options, services())
+	// 仓储注入 writedb
 	options = append(options, repositorys())
+	// 初始化根层 如 httpservcer socketserver
 	options = append(options, invoke())
 	return options
 }
@@ -50,7 +56,7 @@ func base() fx.Option {
 		config.New,
 		loggerProvider,
 		fx.Annotate(httpHandlerProvider, fx.ParamTags(`group:"routes"`)),
-		fx.Annotate(httpServerProvider, fx.ParamTags(``,``,``,``,`name:"systemPool"`)),
+		fx.Annotate(httpServerProvider, fx.ParamTags(``, ``, ``, ``, `name:"systemPool"`)),
 		dbProvider,
 		fx.Annotate(systemPoolProvider, fx.ResultTags(`name:"systemPool"`)),
 	)
@@ -65,7 +71,7 @@ func apis() fx.Option {
 }
 
 func services() fx.Option {
-	return fx.Provide(service.NewUserServiceImpl)
+	return fx.Provide(out.NewUserQueryServiceimpl)
 
 }
 
@@ -95,22 +101,31 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 
 	handler.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		return fmt.Sprintf("[REQ] %s | %-6s| %s | %s | %d %s  %s\n",
-				param.TimeStamp.Format(time.RFC3339),
-				param.Method,
-				param.ClientIP,
-				// param.Request.UserAgent(),
-				param.Path,
-				// param.Request.Proto,
-				param.StatusCode,
-				param.Latency,
-				param.ErrorMessage,
+			param.TimeStamp.Format(time.RFC3339),
+			param.Method,
+			param.ClientIP,
+			// param.Request.UserAgent(),
+			param.Path,
+			// param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.ErrorMessage,
 		)
 	}))
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 
+	authGroup := handler.Group("")
+	authGroup.Use(ginextends.TokenHandler)
+
 	for _, routerGroup := range routers {
 		for _, routerItem := range routerGroup.Router() {
-			handler.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
+			//区分不需登录 和需要登录的接口即可
+			if routerItem.NoAuth {
+				handler.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
+			}else{
+				authGroup.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
+			}
+
 		}
 	}
 	return handler
@@ -172,8 +187,6 @@ var dbProvider = func(lc fx.Lifecycle, cfg *config.Config, logger logger.Interfa
 	return db
 }
 
-
 var loggerProvider = func(cfg *config.Config) logger.Interface {
 	return logger.New(cfg.Log.Level)
 }
-

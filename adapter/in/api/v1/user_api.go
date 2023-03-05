@@ -2,56 +2,56 @@ package v1
 
 import (
 	"net/http"
-	"strconv"
 	"github.com/gin-gonic/gin"
-	"github.com/lj19950508/ddd-demo-go/adapter/in/api/v1/res"
-	"github.com/lj19950508/ddd-demo-go/application/service"
+	"github.com/lj19950508/ddd-demo-go/application/command"
+	"github.com/lj19950508/ddd-demo-go/application/query"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/resultpkg"
 )
 
 type UserApi struct {
-	userService service.UserService
+	userCommandService command.UserCommandService
+	userQueryService query.UserQueryService
 	logger      logger.Interface
 }
 
 func (t *UserApi) Router() ginextends.RouterInfos {
 	return ginextends.RouterInfos{
-		{Method: "GET", Path: "/v1/users/:id", Handle: t.Info},
+		//默认使用user吧
+		{Method: "GET", Path: "/v1/users/:id", Handle: t.Info,NoAuth: true},
+		{Method: "GET", Path: "/v1/user/:id", Handle: t.Info},
 	}
 }
 
-func NewUserApi(userService service.UserService, logger logger.Interface) *UserApi {
+func NewUserApi(userCommandService command.UserCommandService,userQueryService query.UserQueryService, logger logger.Interface) *UserApi {
 	return &UserApi{
-		userService: userService,
+		userCommandService: userCommandService,
+		userQueryService: userQueryService,
 		logger:      logger,
 	}
 }
 
-//Fetch Page
-
-//Create
-
-//Update
-
-//Excel GET
+func (t *UserApi) Delete(c *gin.Context){}
 
 func (t *UserApi) Info(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	var userQuery query.UserQuery
+	err :=c.ShouldBindQuery(&userQuery) //根据情况should活着 must
 	if err != nil {
 		c.JSON(http.StatusBadRequest,resultpkg.Fail(err.Error()))
 		return
 	}
-	t.logger.Info("[访问用户信息-入参] id:%d", id)
-	user, err := t.userService.Info(id)
+	// currentUserId:=c.GetInt64("userId") //注入当前用户 数据权限的方法
+	// userQuery.ID=sql.NullInt64{currentUserId,true}
+
+	t.logger.Info("[访问用户信息-入参];%v", userQuery)
+	user, err := t.userQueryService.FindOne(&userQuery)
 	if err != nil {
 		t.logger.Info("[访问用户信息-错误] err:%s", err)
 		c.JSON(resultpkg.Error(err))
 		return
 	}
-	dto := res.NewUser(user.Id,user.Name)
-	t.logger.Info("[访问用户信息-返回]:%+v", dto)
-	c.JSON(http.StatusOK, resultpkg.Ok(dto))
+	t.logger.Info("[访问用户信息-返回]:%+v", user)
+	c.JSON(http.StatusOK, resultpkg.Ok(user))
 
 }

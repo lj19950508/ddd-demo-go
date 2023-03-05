@@ -1,6 +1,8 @@
 package grails
 
 import (
+	"database/sql"
+
 	user "github.com/lj19950508/ddd-demo-go/domain/user"
 	"github.com/pkg/errors"
 
@@ -10,25 +12,29 @@ import (
 	"gorm.io/gorm"
 )
 
-type User struct {
+type UserPO struct {
 	//可空得用指针
 	//非空用int
 	//ID主键
-	ID   uint
-	Name string
+	ID   sql.NullInt64
+	Name sql.NullString
 }
 
-func NewUserPO(ID uint, Name string) *User {
-	return &User{
-		ID:   ID,
-		Name: Name,
+func NewUserPO(id int64, name string) *UserPO {
+	return &UserPO{
+		ID:   sql.NullInt64{id,true},
+		Name: sql.NullString{name,true},
 	}
 }
+
+//---------------------
 
 type UserRepositoryImpl struct {
 	*db.DB
 	logger.Interface
 }
+
+//------------------
 
 func NewUserRepositoryImpl(mysql *db.DB, logger logger.Interface) user.UserRepository {
 	return &UserRepositoryImpl{
@@ -37,10 +43,10 @@ func NewUserRepositoryImpl(mysql *db.DB, logger logger.Interface) user.UserRepos
 	}
 }
 
-func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
-
+func (t *UserRepositoryImpl) Load(id int) (*user.User, error) {
 	//获取单挑po、
-	var userPo User
+	t.GormDb.Rollback()
+	var userPo UserPO
 	if result := t.GormDb.First(&userPo, id); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -48,7 +54,7 @@ func (t *UserRepositoryImpl) FindById(id int) (*user.User, error) {
 		return nil, errors.WithStack(result.Error)
 	}
 	//把po->domain
-	domainUser := user.NewUser(userPo.ID, userPo.Name)
+	domainUser := user.NewUser(userPo.ID.Int64, userPo.Name.String)
 	return domainUser, nil
 }
 
