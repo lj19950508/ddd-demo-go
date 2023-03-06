@@ -8,7 +8,7 @@ import (
 
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
-	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/api/v1"
+	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/api"
 	"github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl"
 	"github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl"
 	"github.com/lj19950508/ddd-demo-go/config"
@@ -37,7 +37,7 @@ func options() []fx.Option {
 	options = append(options, base())
 	// api接口
 	options = append(options, apis())
-	// service cqrs的体现  
+	// service cqrs的体现
 	// queryservice 注入 queryserviceimpl 注入  读库的 db,es,redis
 	options = append(options, queryService())
 	options = append(options, cmdService())
@@ -117,19 +117,32 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 		)
 	}))
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
-
-	authGroup := handler.Group("")
-	authGroup.Use(ginextends.TokenHandler)
+	handler.Use(func(ctx *gin.Context) {
+		//比如加入 第三方登录 商家端也可以第三方登录  微信登录商家
+		//开放平台Oauth登录 开放给QQ     知服登录QQ （）  返回用户信息，openid给qq
+		//登录凭证登录
+		//手机密码登录
+		//auth 授权 通过 
+		//if prefix api
+		//if prefix admin
+		//if prefix ...
+		//or 都是使用
+		//如果做一个根据账号密码登录
+		// loadbyusernmae
+		// issample  return token
+		// 调用短信模块功能并返回正确或者错误
+		// rpc.verifyCode(mobile)
+		// 生成临时登录凭证   
+		//1.获取短信验证码 =》 生成临时登录凭证  code:=login.getmsg(mobile) pushverty  code=>redis.  
+		//2.登录   =》 手机号+
+	   
+	})
 
 	for _, routerGroup := range routers {
 		for _, routerItem := range routerGroup.Router() {
 			//区分不需登录 和需要登录的接口即可
 			//生成资源的接口 。。
-			if routerItem.NoAuth {
-				handler.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
-			}else{
-				authGroup.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
-			}
+			handler.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
 
 		}
 	}

@@ -83,9 +83,13 @@ domain
 
 ### 总结一下
 多用户类型用前缀分组如
-/api（客户，游客）  解析token（在本体,不存在query远程调用的情况）
-/merchant (商户)   解析token  在本体
-/admin (管理员)    解析token  
+/api（客户，游客）  
+/merchant (商户)   
+/admin (管理员)    
+在网关中解析 判断
+/api默认都是要登录才可以访问
+<!-- /admin 不仅要登录 还要有资源 -->
+ <!-- /merchant不仅登录 还要有资源 -->
 /物流配送 (如果配送物流是自己管理的话)
 之所以这么粉因为不同类型的用户 调用的接口基本上都是不一样的 从query上来说
 
@@ -101,3 +105,20 @@ command可以返回值
 command 附带excuteResult or return
 eventbus.handler->c
 repo 变成 add和save方法
+
+
+//在网关中实现的话
+//1.admin-resource 获取不到的都放行
+//2.api所有东西都要登录 除了有标志的接口
+user->gateway-> 
+/admin接口=>
+/merchant接口
+/api接口
+都是根据prefix判断的
+
+
+//auth 
+api网关鉴权
+auth授权
+//api网关
+//现在单体实现吧 草
