@@ -124,6 +124,7 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 	for _, routerGroup := range routers {
 		for _, routerItem := range routerGroup.Router() {
 			//区分不需登录 和需要登录的接口即可
+			//生成资源的接口 。。
 			if routerItem.NoAuth {
 				handler.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
 			}else{

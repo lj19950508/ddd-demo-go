@@ -1,34 +1,37 @@
 package ginextends
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
+	// "github.com/golang-jwt/jwt/v5"
 )
 
 var TokenWithPermissionHandler = func(ctx *gin.Context) {
-	tokenString := ctx.GetHeader("Authorization")
-	// Bearer
-	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+	//ctx.GetPermission()
+	// if( admin && ctx.GetPermission 包含 当前资源则可以访问)
+	//admin PERMISSION has->ctx.url
+	//userapi notpermission   =》ctx.GET(userid)
+	//user 
+	// tokenString := ctx.GetHeader("Authorization")
+	// // Bearer
+	// token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 
-		//需要用私钥解密
-		// since we only use the one private key to sign the tokens,
-		// we also only use its public counter part to verify
-		return "", nil
-	})
-	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, nil)
-	}
-	claim, ok := token.Claims.(jwt.MapClaims)
-	// a:=claim["userId"]
+	// 	//需要用私钥解密
+	// 	// since we only use the one private key to sign the tokens,
+	// 	// we also only use its public counter part to verify
+	// 	return "", nil
+	// })
+	// if err != nil {
+	// 	ctx.JSON(http.StatusUnauthorized, nil)
+	// }
+	// claim, ok := token.Claims.(jwt.MapClaims)
+	// // a:=claim["userId"]
 
-	//adminId本质是一种数据权限的行为
-	adminId := claim["adminId"]
-	if adminId == nil {
-		ctx.JSON(http.StatusUnauthorized, nil)
-	}
-	ctx.Set("currentAdminId", adminId)
+	// //adminId本质是一种数据权限的行为
+	// adminId := claim["adminId"]
+	// if adminId == nil {
+	// 	ctx.JSON(http.StatusUnauthorized, nil)
+	// }
+	// ctx.Set("currentAdminId", adminId)
 	// ctx.GetInt()
 
 	//TODO 权限问题
@@ -53,10 +56,10 @@ var TokenWithPermissionHandler = func(ctx *gin.Context) {
 
 	//PERMISSION  GET /usr/set/sdjfkl
 	// b:=claim["permission"]
-	if !ok {
-		ctx.JSON(http.StatusUnauthorized, nil)
-	}
-	// claim.GetSubject()
+	// if !ok {
+	// 	ctx.JSON(http.StatusUnauthorized, nil)
+	// }
+	// // claim.GetSubject()
 	// claim.GetIssuer()
 	// claim.GetAudience() 受众
 	// c
