@@ -202,7 +202,7 @@ GATEWAY
 资源中心
 接口  GET /api 
 菜单 menu 
-数据权限 row   table cond
-         col   table, cols
-  - 行权限  ctx.GET(ROW) where ROW_ID = ROWID
-  - 列权限  IF(ROW) select(ctx.cols).whwere
+
+服务间交互用eventbus
+先不做权限了 ，token解析好继续ing 
+直接访问都要鉴权 CMD
