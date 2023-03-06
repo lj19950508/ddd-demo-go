@@ -22,8 +22,8 @@ type UserPO struct {
 
 func NewUserPO(id int64, name string) *UserPO {
 	return &UserPO{
-		ID:   sql.NullInt64{id,true},
-		Name: sql.NullString{name,true},
+		ID:   sql.NullInt64{Int64: id,Valid: true},
+		Name: sql.NullString{String: name,Valid: true},
 	}
 }
 
@@ -63,12 +63,26 @@ func (t *UserRepositoryImpl) Save(user *user.User) error {
 	//do -> po
 	userPo := NewUserPO(5, "test")
 	//更具IDsave
-	result := t.GormDb.Save(user)
+	result := t.GormDb.Save(userPo)
 	if result.Error != nil {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
 		t.Warn("0 rows affected,%+v", userPo)
 	}
+	return nil
+}
+
+func (t *UserRepositoryImpl) Add(user *user.User) error {
+	//这里可以把userpo和user何在一起吗？
+	//Fetch save 模型  Update都必须取回才能操作
+	//do -> po
+	userPo := NewUserPO(5, "test")
+	//更具IDsave
+	result := t.GormDb.Create(userPo)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }

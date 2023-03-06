@@ -13,30 +13,26 @@ func NewUser(Id int64, name string) *User {
 	return &User{Id: Id, Name: name}
 }
 
-//具体业务数据操作
-//领域服务
 
+//只有聚合根才有仓储功能
 type UserRepository interface {
 
 	//domain
 	Load(id int) (*User, error)
 
 	//FindList() []*entity.User
-
+	Add(user *User) error
 	Save(user *User) error
 }
 
 var (
 	//业务异常码
-	errUserDisabled = bizerror.NewBizError(100,"禁用用户")
+	errUserDisabled = bizerror.NewBizError(100, "禁用用户")
 )
 
-
 //------------------
-type UserService struct{
+type UserService struct {
 	//Swap(User1,User2)比如这个
 	//多个user domain交互需要用到这个，能用 domain实现则用domain，
 	//这里的行为是一个独立的可描述的对象
 }
-
-

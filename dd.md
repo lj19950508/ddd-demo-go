@@ -96,7 +96,8 @@ domain
 
 用户登录的场景中
 用户根据 登录凭证 生成jwt
-command可以返回值 eventbus
+command可以返回值 
 用户 ->提交登录凭证 ——> query
 command 附带excuteResult or return
 eventbus.handler->c
+repo 变成 add和save方法
