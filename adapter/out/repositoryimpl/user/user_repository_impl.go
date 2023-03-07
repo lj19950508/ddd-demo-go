@@ -1,8 +1,7 @@
 package repositoryimpl
 
 import (
-	"database/sql"
-
+	"github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user/po"
 	user "github.com/lj19950508/ddd-demo-go/domain/user"
 	"github.com/pkg/errors"
 
@@ -12,22 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserPO struct {
-	//可空得用指针
-	//非空用int
-	//ID主键
-	ID   sql.NullInt64
-	Name sql.NullString
-}
 
-func NewUserPO(id int64, name string) *UserPO {
-	return &UserPO{
-		ID:   sql.NullInt64{Int64: id,Valid: true},
-		Name: sql.NullString{String: name,Valid: true},
-	}
-}
-
-//---------------------
 
 type UserRepositoryImpl struct {
 	*db.DB
@@ -45,8 +29,7 @@ func NewUserRepositoryImpl(mysql *db.DB, logger logger.Interface) user.UserRepos
 
 func (t *UserRepositoryImpl) Load(id int) (*user.User, error) {
 	//获取单挑po、
-	t.GormDb.Rollback()
-	var userPo UserPO
+	var userPo po.User
 	if result := t.GormDb.First(&userPo, id); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -61,7 +44,7 @@ func (t *UserRepositoryImpl) Load(id int) (*user.User, error) {
 func (t *UserRepositoryImpl) Save(user *user.User) error {
 	//Fetch save 模型  Update都必须取回才能操作
 	//do -> po
-	userPo := NewUserPO(5, "test")
+	userPo := po.NewUserPO(5, "test")
 	//更具IDsave
 	result := t.GormDb.Save(userPo)
 	if result.Error != nil {
@@ -74,10 +57,7 @@ func (t *UserRepositoryImpl) Save(user *user.User) error {
 }
 
 func (t *UserRepositoryImpl) Add(user *user.User) error {
-	//这里可以把userpo和user何在一起吗？
-	//Fetch save 模型  Update都必须取回才能操作
-	//do -> po
-	userPo := NewUserPO(5, "test")
+	userPo := po.NewUserPO(5, "test")
 	//更具IDsave
 	result := t.GormDb.Create(userPo)
 	if result.Error != nil {
@@ -86,3 +66,5 @@ func (t *UserRepositoryImpl) Add(user *user.User) error {
 
 	return nil
 }
+
+

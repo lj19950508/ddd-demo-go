@@ -8,9 +8,11 @@ import (
 
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
-	v1 "github.com/lj19950508/ddd-demo-go/adapter/in/api"
-	"github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl"
-	"github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl"
+	adminapi "github.com/lj19950508/ddd-demo-go/adapter/in/adminapi/user"
+	api "github.com/lj19950508/ddd-demo-go/adapter/in/api/user"
+	queryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl/user"
+	repositoryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user"
+	command "github.com/lj19950508/ddd-demo-go/application/command/user"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
@@ -22,7 +24,6 @@ import (
 var app *fx.App
 
 func main() {
-
 	app = fx.New(
 		options()...,
 	)
@@ -66,17 +67,18 @@ func base() fx.Option {
 
 func apis() fx.Option {
 	return fx.Provide(
-		asRoute(v1.NewUserApi),
+		asRoute(api.NewUserApi),
+		asRoute(adminapi.NewAdminUserApi),
 	)
 
 }
 
 func queryService() fx.Option {
-	return fx.Provide(queryimpl.NewUserQueryServiceimpl)
+	return fx.Provide(queryimpl.NewUserQueryServiceImpl)
 }
 
 func cmdService() fx.Option {
-	return fx.Provide(queryimpl.NewUserQueryServiceimpl)
+	return fx.Provide(command.NewUserCommandImpl)
 }
 
 func repositorys() fx.Option {
@@ -108,9 +110,7 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 			param.TimeStamp.Format(time.RFC3339),
 			param.Method,
 			param.ClientIP,
-			// param.Request.UserAgent(),
 			param.Path,
-			// param.Request.Proto,
 			param.StatusCode,
 			param.Latency,
 			param.ErrorMessage,
@@ -118,32 +118,15 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 	}))
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 	handler.Use(func(ctx *gin.Context) {
-		//比如加入 第三方登录 商家端也可以第三方登录  微信登录商家
-		//开放平台Oauth登录 开放给QQ     知服登录QQ （）  返回用户信息，openid给qq
-		//登录凭证登录
-		//手机密码登录
-		//auth 授权 通过 
-		//if prefix api
-		//if prefix admin
-		//if prefix ...
-		//or 都是使用
-		//如果做一个根据账号密码登录
-		// loadbyusernmae
-		// issample  return token
-		// 调用短信模块功能并返回正确或者错误
-		// rpc.verifyCode(mobile)
-		// 生成临时登录凭证   
-		//1.获取短信验证码 =》 生成临时登录凭证  code:=login.getmsg(mobile) pushverty  code=>redis.  
-		//2.登录   =》 手机号+
-	   
+		//这里实现可以轻松提到api网关的操作
+		//todo if prefix with admin
+		//else if prefix with permit(放行)
+		//else 需要登录才可以访问
 	})
 
 	for _, routerGroup := range routers {
 		for _, routerItem := range routerGroup.Router() {
-			//区分不需登录 和需要登录的接口即可
-			//生成资源的接口 。。
 			handler.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
-
 		}
 	}
 	return handler

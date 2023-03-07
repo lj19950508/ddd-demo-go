@@ -1,13 +1,15 @@
 package api
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
-	"github.com/lj19950508/ddd-demo-go/application/command"
-	"github.com/lj19950508/ddd-demo-go/application/query"
+	command "github.com/lj19950508/ddd-demo-go/application/command/user"
+	query "github.com/lj19950508/ddd-demo-go/application/query/user"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/resultpkg"
-	"net/http"
 )
 
 type UserApi struct {
@@ -20,7 +22,6 @@ func (t *UserApi) Router() ginextends.RouterInfos {
 	return ginextends.RouterInfos{
 		//默认使用user吧
 		{Method: "GET", Path: "/v1/users/:id", Handle: t.Info},
-		{Method: "GET", Path: "/v1/user/:id", Handle: t.Info},
 	}
 }
 
@@ -32,26 +33,24 @@ func NewUserApi(userCommandService command.UserCommandService, userQueryService 
 	}
 }
 
-func (t *UserApi) Delete(c *gin.Context) {}
+
 
 func (t *UserApi) Info(c *gin.Context) {
-	var userQuery query.UserQuery
-	err := c.ShouldBindQuery(&userQuery) //根据情况should活着 must
+	id :=c.Param("id")
+	userId ,err:= strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, resultpkg.Fail(err.Error()))
 		return
 	}
-	// currentUserId:=c.GetInt64("userId") //注入当前用户 数据权限的方法
-	// userQuery.ID=sql.NullInt64{currentUserId,true}
 
-	t.logger.Info("[访问用户信息-入参];%v", userQuery)
-	user, err := t.userQueryService.FindOne(&userQuery)
+	
+	user, err := t.userQueryService.FindOne(&query.UserQuery{
+		IdEq: &userId,
+	})
 	if err != nil {
-		t.logger.Info("[访问用户信息-错误] err:%s", err)
 		c.JSON(resultpkg.Error(err))
 		return
 	}
-	t.logger.Info("[访问用户信息-返回]:%+v", user)
 	c.JSON(http.StatusOK, resultpkg.Ok(user))
 
 }
