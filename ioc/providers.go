@@ -131,3 +131,7 @@ var loggerProvider = func(cfg *config.Config) logger.Interface {
 var inProcEventBusProvider  = func (cfg *config.Config) bus.Bus{
 	return bus.New()
 }
+
+// var eventBusHandle  = func (lc fx.Lifecycle, cfg *config.Config) eventEventHandler{
+// 	return bus.New()
+// }

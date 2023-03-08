@@ -3,7 +3,7 @@ package ioc
 import (
 	adminapi "github.com/lj19950508/ddd-demo-go/adapter/in/adminapi/user"
 	api "github.com/lj19950508/ddd-demo-go/adapter/in/api/user"
-	eventhandler "github.com/lj19950508/ddd-demo-go/adapter/out/eventhandler/user"
+	evthandler "github.com/lj19950508/ddd-demo-go/adapter/in/eventhandler/user"
 	queryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl/user"
 	repositoryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user"
 	command "github.com/lj19950508/ddd-demo-go/application/command/user"
@@ -41,6 +41,10 @@ func repositorys() fx.Option {
 	return fx.Provide(repositoryimpl.NewUserRepositoryImpl)
 }
 
+func eventhandler() fx.Option{
+	return fx.Provide(evthandler.NewUserEventHandler)
+}
+
 func options() []fx.Option {
 	options := []fx.Option{}
 	// 基础实现层 如http mysql ，redis ，web
@@ -53,6 +57,7 @@ func options() []fx.Option {
 	options = append(options, cmdService())
 	// 仓储注入 writedb
 	options = append(options, repositorys())
+	options = append(options, eventhandler())
 	// 初始化根层 如 httpservcer socketserver
 	options = append(options, invoke())
 	return options
@@ -61,7 +66,8 @@ func options() []fx.Option {
 func invoke() fx.Option {
 	return fx.Invoke(
 		func(*httpserver.Server) {},
-		func(*eventhandler.EventHandler) {})
+		func(*evthandler.UserEventHandler) {},
+	)
 
 }
 
@@ -72,7 +78,6 @@ func base() fx.Option {
 		fx.Annotate(httpHandlerProvider, fx.ParamTags(`group:"routes"`)),
 		fx.Annotate(httpServerProvider, fx.ParamTags(``, ``, ``, ``, `name:"systemPool"`)),
 		dbProvider,
-		eventhandler.NewEventHandler,
 		inProcEventBusProvider,
 		fx.Annotate(systemPoolProvider, fx.ResultTags(`name:"systemPool"`)),
 	)

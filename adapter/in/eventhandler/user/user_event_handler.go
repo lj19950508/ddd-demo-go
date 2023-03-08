@@ -6,14 +6,22 @@ import (
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 )
 
-type EventHandler struct {
+//这个改成类似api的处理 
+//然后有一个eventbushandler 是
+//用户子域的事件处理
+
+//EventHandler inteface has a router  routerInfo [message,func]
+//TODO eventbus need eventhandler[]  and eventbus foreach .AddEventListenr()
+//   Queue=>func (evt *user.EvtUserCreate) error
+// so just need eventbu
+
+type UserEventHandler struct {
 	eventBus bus.Bus
 	logger   logger.Interface
 }
 
-func NewEventHandler(eventBus bus.Bus, logger logger.Interface) *EventHandler {
+func NewUserEventHandler(eventBus bus.Bus, logger logger.Interface) *UserEventHandler {
 	eventBus.AddEventListener(func(evt *user.EvtUserCreate) error {
-		//TODO eventbus 需要改版 可以 同步或异步，同步可以返回值， 目前这个grafa的方案比较一般 试试改成mq。。 或者自己写 go fun
 		logger.Info("收到了eventbus2的消息")
 		return nil
 	})
@@ -21,7 +29,7 @@ func NewEventHandler(eventBus bus.Bus, logger logger.Interface) *EventHandler {
 		logger.Info("收到了eventbus1的消息")
 		return nil
 	})
-	return &EventHandler{
+	return &UserEventHandler{
 		eventBus,
 		logger,
 	}
