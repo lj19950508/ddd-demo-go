@@ -16,7 +16,7 @@
  - 在需要使用原对象引用的方法 声明才使用指针，不需要则用结构体，同理 传入判断是否是指针 以被传入的方法为准
  - compoent这种单例对象的构造使用指针存入ioc
 ## 变量类型规范
- - 使用int 而不是 int64 int32 ?
+ - 使用int，除非数值上下限很高则使用int64  用int效率高，不用int则要额外指令根据机器去处理 如长id用64 ，计量用64， 但是状态用int
  - 不使用枚举类
 ## 错误使用规范以及返回规范
  - 不在服务中直接处理异常，返回到controller中处理
@@ -30,8 +30,7 @@
 ## 引入标准
  - 【规则1.3.2】禁止使用相对路径导入（./subpackage），所有导入路径必须符合 go get 标准。
  - 【建议1.3.3】建议使用goimports工具或者IDE工具来管理多行import
- - module 以全仓库命名 module github.com/evrone/go-clean-template
-
+ - module 以全仓库命名 module github.com/evrone/go-clean-template##
 
 更多规范 //https://www.jianshu.com/p/20861de6332c
 错误处理 https://zhuanlan.zhihu.com/p/328591249
@@ -39,3 +38,9 @@
 
 ————————————————
 https://blog.csdn.net/u010524722/article/details/124512369
+
+不使用空值 如何实现业务效果  如查询购买数量为0的商品 
+//能用非空就用非空 不能用再用指针变量， 如 查询购买数量为0的商品  json query 的 数量要为指针 （可传可不传query用指针）
+考虑到query 和result ， 数据库中的字段暂定都为非空和零值
+query 可穿可不穿的定义为指针
+result  返回不为指针

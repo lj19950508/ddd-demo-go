@@ -39,9 +39,8 @@ func (t *UserQueryServiceImpl) FindOne(cond *query.UserQuery) (*query.UserResult
 		}
 		return nil, errors.WithStack(result.Error)
 	}
-	id := int(userPo.ID.Int64)
 
-	result := query.NewUserResult(&id, &userPo.Name.String)
+	result := query.NewUserResult(userPo.ID, userPo.Name)
 	return result, nil
 
 }
@@ -57,9 +56,7 @@ func (t *UserQueryServiceImpl) FindList(cond *query.UserPageQuery) (*query.PageR
 		if cond.NameLike != nil {
 			d.Where("name LIKE ?", "%"+*cond.NameLike+"%")
 		}
-		if cond.Page != nil && cond.Size != nil {
-			d.Offset(*cond.Page * *cond.Size).Limit(*cond.Size)
-		}
+		d.Offset(cond.Page * cond.Size).Limit(cond.Size)
 		return d
 	}).Find(&userPo).Count(&count); result.Error != nil {
 		return nil, errors.WithStack(result.Error)
@@ -67,9 +64,8 @@ func (t *UserQueryServiceImpl) FindList(cond *query.UserPageQuery) (*query.PageR
 
 	var result []query.UserResult
 	for i := range userPo {
-		id := int(userPo[i].ID.Int64)
-		result = append(result, *query.NewUserResult(&id, &userPo[i].Name.String))
+		result = append(result, *query.NewUserResult(userPo[i].ID, userPo[i].Name))
 	}
 	//
-	return query.NewPageResult[query.UserResult](result,count), nil
+	return query.NewPageResult(result, count), nil
 }

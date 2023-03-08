@@ -37,7 +37,7 @@ func (t *UserRepositoryImpl) Load(id int) (*user.User, error) {
 		return nil, errors.WithStack(result.Error)
 	}
 	//把po->domain
-	domainUser := user.NewUser(userPo.ID.Int64, userPo.Name.String)
+	domainUser := user.NewUser(userPo.ID, userPo.Name)
 	return domainUser, nil
 }
 

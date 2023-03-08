@@ -15,10 +15,10 @@ func NewPageResult[T any](list []T,count int64) *PageResult[T]{
 
 
 type UserResult  struct {
-	ID *int  `json:"id"`
-	Name *string `json:"name"`
+	ID int64  `json:"id"`
+	Name string `json:"name"`
 }
 
-func NewUserResult(id *int,Name *string) *UserResult{
+func NewUserResult(id int64,Name string) *UserResult{
 	return &UserResult{id,Name}
 }
