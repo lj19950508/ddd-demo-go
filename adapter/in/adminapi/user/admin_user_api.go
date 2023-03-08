@@ -2,6 +2,7 @@ package adminapi
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	command "github.com/lj19950508/ddd-demo-go/application/command/user"
@@ -22,9 +23,9 @@ func (t *AdminUserApi) Router() ginextends.RouterInfos {
 	return ginextends.RouterInfos{
 		//默认使用user吧
 		{Method: "GET", Path: "/admin/users", Handle: t.List},
-		{Method: "POST", Path: "/admin/users", Handle: nil},
-		{Method: "PUT", Path: "/admin/users", Handle: nil},
-		{Method: "DELETE", Path: "/admin/users/:id", Handle: nil},
+		{Method: "POST", Path: "/admin/users", Handle: t.Create},
+		{Method: "PUT", Path: "/admin/users", Handle: t.Update},
+		{Method: "DELETE", Path: "/admin/users/:id", Handle: t.Delete},
 	}
 }
 
@@ -36,11 +37,9 @@ func NewAdminUserApi(userCommandService command.UserCommandService, userQuerySer
 	}
 }
 
-
 func (t *AdminUserApi) List(c *gin.Context) {
 	var cond query.UserPageQuery
-	err:=c.Bind(&cond)
-	// validator.New().Struct(&cond)
+	err := c.Bind(&cond)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, resultpkg.Fail(err.Error()))
 		return
@@ -50,8 +49,52 @@ func (t *AdminUserApi) List(c *gin.Context) {
 		c.JSON(resultpkg.Error(err))
 		return
 	}
-	c.JSON(http.StatusOK, resultpkg.Ok(users))
-
+	c.JSON(http.StatusOK, resultpkg.OkData(users))
 }
 
+func (t *AdminUserApi) Create(c *gin.Context) {
+	var cmd command.CreateCommand
+	err := c.Bind(&cmd)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, resultpkg.Fail(err.Error()))
+		return
+	}
 
+	err = t.userCommandService.Create(&cmd)
+	if err != nil {
+		c.JSON(resultpkg.Error(err))
+		return
+	}
+	c.JSON(http.StatusOK, resultpkg.Ok())
+}
+
+func (t *AdminUserApi) Update(c *gin.Context) {
+	var cmd command.UpdateCommand
+	err := c.Bind(&cmd)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, resultpkg.Fail(err.Error()))
+		return
+	}
+	err = t.userCommandService.Update(&cmd)
+	if err != nil {
+		c.JSON(resultpkg.Error(err))
+		return
+	}
+	c.JSON(http.StatusOK, resultpkg.Ok())
+}
+
+func (t *AdminUserApi) Delete(c *gin.Context) {
+	id := c.Param("id")
+	userId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, resultpkg.Fail(err.Error()))
+		return
+	}
+
+	err = t.userCommandService.Delete(userId)
+	if err != nil {
+		c.JSON(resultpkg.Error(err))
+		return
+	}
+	c.JSON(http.StatusOK, resultpkg.Ok())
+}

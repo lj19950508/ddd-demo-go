@@ -1,6 +1,7 @@
 package repositoryimpl
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user/po"
 	user "github.com/lj19950508/ddd-demo-go/domain/user"
 	"github.com/pkg/errors"
@@ -8,10 +9,7 @@ import (
 	// "github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
-	"gorm.io/gorm"
 )
-
-
 
 type UserRepositoryImpl struct {
 	*db.DB
@@ -27,12 +25,12 @@ func NewUserRepositoryImpl(mysql *db.DB, logger logger.Interface) user.UserRepos
 	}
 }
 
-func (t *UserRepositoryImpl) Load(id int) (*user.User, error) {
+func (t *UserRepositoryImpl) Load(id int64) (*user.User, error) {
 	//获取单挑po、
 	var userPo po.User
 	if result := t.GormDb.First(&userPo, id); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return nil, nil
+			return nil, user.ErrUserNoExists
 		}
 		return nil, errors.WithStack(result.Error)
 	}
@@ -41,30 +39,42 @@ func (t *UserRepositoryImpl) Load(id int) (*user.User, error) {
 	return domainUser, nil
 }
 
-func (t *UserRepositoryImpl) Save(user *user.User) error {
-	//Fetch save 模型  Update都必须取回才能操作
-	//do -> po
-	userPo := po.NewUserPO(5, "test")
+func (t *UserRepositoryImpl) Add(user *user.User) error {
 	//更具IDsave
-	result := t.GormDb.Save(userPo)
+	result := t.GormDb.Create(&po.User{
+		Name: user.Name,
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (t *UserRepositoryImpl) Save(user *user.User) error {
+	userPo := po.User{
+		ID:   user.Id,
+		Name: user.Name,
+	}
+	result := t.GormDb.Save(&userPo)
 	if result.Error != nil {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		t.Warn("0 rows affected,%+v", userPo)
+		t.Error("0 rows affected when save,%+v", &userPo)
 	}
 	return nil
 }
 
-func (t *UserRepositoryImpl) Add(user *user.User) error {
-	userPo := po.NewUserPO(5, "test")
+func (t *UserRepositoryImpl) Remove(user *user.User) error {
 	//更具IDsave
-	result := t.GormDb.Create(userPo)
+	result := t.GormDb.Delete(&po.User{
+		ID:   user.Id,
+		Name: user.Name,
+	})
 	if result.Error != nil {
 		return result.Error
 	}
 
 	return nil
 }
-
-

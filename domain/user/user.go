@@ -18,16 +18,18 @@ func NewUser(Id int64, name string) *User {
 type UserRepository interface {
 
 	//domain
-	Load(id int) (*User, error)
+	Load(id int64) (*User, error)
 
 	//FindList() []*entity.User
 	Add(user *User) error
 	Save(user *User) error
+	Remove(user *User) error
 }
 
 var (
 	//业务异常码
-	errUserDisabled = bizerror.NewBizError(100, "禁用用户")
+	ErrUserNoExists =  bizerror.NewBizError(100, "用户不存在")
+	ErrUserDisabled = bizerror.NewBizError(101, "禁用用户")
 )
 
 //------------------

@@ -2,7 +2,7 @@ package query
 
 
 type UserQuery struct{
-	IdEq *int `form:"id"`
+	IdEq *int64 `form:"id"`
 	NameLike *string `form:"name"`
 }
 

@@ -3,6 +3,7 @@ package resultpkg
 import (
 	"fmt"
 	"net/http"
+
 	"github.com/lj19950508/ddd-demo-go/pkg/resultpkg/bizerror"
 )
 
@@ -27,7 +28,12 @@ var (
 	BizCodeError = -1
 )
 
-func Ok(data any) *Result {
+func Ok() *Result {
+	//TODO 根据option
+	return NewResult(nil, BizCodeNormal, "")
+}
+
+func OkData(data any) *Result {
 	return NewResult(data, BizCodeNormal, "")
 }
 
@@ -35,10 +41,9 @@ func OkMsg(msg string) *Result {
 	return NewResult(nil, BizCodeNormal, msg)
 }
 
-func Fail(msg string)* Result{
+func Fail(msg string) *Result {
 	return NewResult(nil, BizCodeError, msg)
 }
-
 
 func Error(err error) (int, *Result) {
 	//error is biz error
@@ -46,10 +51,9 @@ func Error(err error) (int, *Result) {
 	case *bizerror.BizError:
 		return http.StatusOK, NewResult(nil, v.BizCode, err.Error())
 	default:
-		return http.StatusInternalServerError, NewResult(nil, BizCodeError, fmt.Sprintf("%+v", err))
+		fmt.Printf("[Unexpected error]:%+v", err)
+		return http.StatusInternalServerError, NewResult(nil, BizCodeError, err.Error())
 	}
 
-
-	
 	//业务异常不包装堆栈
 }

@@ -1,9 +1,11 @@
 package command
 
-import "database/sql"
 
 
-type SaveCommand struct{
-	ID sql.NullInt64 `form:"id" json:"id"`
-	Name sql.NullString `form:"name" json:"name"`
+type UpdateCommand struct{
+	ID int64 `form:"id" json:"id"`
+	Name string `form:"name" json:"name"`
+}
+type CreateCommand struct{
+	Name string `form:"name" json:"name"`
 }

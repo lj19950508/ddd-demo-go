@@ -7,12 +7,3 @@ type User struct {
 	ID   int64
 	Name string
 }
-
-func NewUserPO(id int64, name string) *User {
-	return &User{
-		ID:   id,
-		Name: name,
-	}
-}
-
-//---------------------

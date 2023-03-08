@@ -5,7 +5,9 @@ import (
 )
 
 type UserCommandService interface {
-	Save(cmd SaveCommand) error
+	Create(cmd *CreateCommand) error
+	Update(cmd *UpdateCommand) error
+	Delete(id int64) error
 }
 
 //---------------------------
@@ -20,14 +22,34 @@ func NewUserCommandImpl(userRepository userpkg.UserRepository) UserCommandServic
 	}
 }
 
-func (t UserCommandImpl) Save(cmd SaveCommand) error {
-	//2. 操作仓储或者队列
-	//3. 操作domain,或者领域服务
-	//4. 返回一个domain 
-	// user,err := t.userRepository.Load(id)
-	// if(user==nil){
-	// 	return nil,userpkg.ErrOrderStatusError
-	// }
-	// return user,err
+func (t UserCommandImpl) Create(cmd *CreateCommand) error {
+	user := userpkg.NewUser(0, cmd.Name)
+	if err := t.userRepository.Add(user); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t UserCommandImpl) Update(cmd *UpdateCommand) error {
+	user, err := t.userRepository.Load(cmd.ID)
+	if err != nil {
+		return err
+	}
+	user.Name = cmd.Name
+	if err = t.userRepository.Save(user); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t UserCommandImpl) Delete(id int64) error {
+	user, err := t.userRepository.Load(id)
+	if err != nil {
+		return err
+	}
+
+	if err := t.userRepository.Remove(user); err != nil {
+		return err
+	}
 	return nil
 }

@@ -23,6 +23,8 @@ require (
 
 require (
 	github.com/ilyakaznacheev/cleanenv v1.3.0
+	github.com/jinzhu/gorm v1.9.16
+	go.uber.org/fx v1.19.2
 	gorm.io/gorm v1.23.8
 )
 
@@ -31,7 +33,6 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0-rc.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
@@ -40,7 +41,6 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/dig v1.16.1 // indirect
-	go.uber.org/fx v1.19.2 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
@@ -54,7 +54,6 @@ require (
 	github.com/bytedance/gopkg v0.0.0-20230224073017-0b6876860a2f
 	github.com/evrone/go-clean-template v1.4.2
 	github.com/google/uuid v1.3.0
-	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.29.0
