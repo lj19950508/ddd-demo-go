@@ -1,14 +1,12 @@
 package repositoryimpl
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user/po"
 	user "github.com/lj19950508/ddd-demo-go/domain/user"
 	"github.com/pkg/errors"
-
-	// "github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
+	"gorm.io/gorm"
 )
 
 type UserRepositoryImpl struct {
