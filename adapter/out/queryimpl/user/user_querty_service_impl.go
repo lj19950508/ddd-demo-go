@@ -9,7 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// TODO 这个service可以从各种地方 es,db,redis,混合查询
 
 type UserQueryServiceImpl struct {
 	*db.DB

@@ -42,7 +42,6 @@ func (t *UserApi) Info(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, resultpkg.Fail(err.Error()))
 		return
 	}
-
 	
 	user, err := t.userQueryService.FindOne(&query.UserQuery{
 		IdEq: &userId,

@@ -38,3 +38,8 @@ type UserService struct {
 	//多个user domain交互需要用到这个，能用 domain实现则用domain，
 	//这里的行为是一个独立的可描述的对象
 }
+
+type EvtUserCreate struct{
+	Id int64
+	Name string
+}

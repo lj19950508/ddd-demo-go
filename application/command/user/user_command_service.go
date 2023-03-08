@@ -1,6 +1,7 @@
 package command
 
 import (
+	"github.com/grafana/grafana/pkg/bus"
 	userpkg "github.com/lj19950508/ddd-demo-go/domain/user"
 )
 
@@ -14,11 +15,13 @@ type UserCommandService interface {
 
 type UserCommandImpl struct {
 	userRepository userpkg.UserRepository
+	eventBus       bus.Bus
 }
 
-func NewUserCommandImpl(userRepository userpkg.UserRepository) UserCommandService {
+func NewUserCommandImpl(userRepository userpkg.UserRepository, eventBus bus.Bus) UserCommandService {
 	return &UserCommandImpl{
 		userRepository: userRepository,
+		eventBus:       eventBus,
 	}
 }
 
@@ -27,6 +30,14 @@ func (t UserCommandImpl) Create(cmd *CreateCommand) error {
 	if err := t.userRepository.Add(user); err != nil {
 		return err
 	}
+	err := t.eventBus.Publish(&userpkg.EvtUserCreate{
+		Id:   user.Id,
+		Name: user.Name,
+	})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
