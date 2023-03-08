@@ -40,6 +40,7 @@ func NewAdminUserApi(userCommandService command.UserCommandService, userQuerySer
 func (t *AdminUserApi) List(c *gin.Context) {
 	var cond query.UserPageQuery
 	err:=c.Bind(&cond)
+	// validator.New().Struct(&cond)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, resultpkg.Fail(err.Error()))
 		return

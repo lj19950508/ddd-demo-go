@@ -71,7 +71,7 @@ func (t *DB) Open() error {
 	})
 
 	if err != nil {
-		return nil
+		return err
 	}
 	t.GormDb = gormDB
 	sqlDB, err := gormDB.DB()

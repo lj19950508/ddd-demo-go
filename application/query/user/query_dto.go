@@ -8,7 +8,7 @@ type UserQuery struct{
 
 type PageQuery struct{
 	Page int `form:"page"`
-	Size int `form:"size"`
+	Size int `form:"size"  binding:"gt=0,lte=10"`
 	//size必传且小雨10
 }
 

@@ -96,6 +96,7 @@ func asRoute(f any) any {
 //
 
 var systemPoolProvider = func() gopool.Pool {
+	//有没有释放
 	pool := gopool.NewPool("system", int32(100), &gopool.Config{ScaleThreshold: 80})
 	return pool
 }
@@ -137,14 +138,15 @@ var httpServerProvider = func(lc fx.Lifecycle, cfg *config.Config, handler http.
 
 	httpServerOnStart := func(ctx context.Context) error {
 		s.Start()
-		logger.Info("httpserver start finished")
+		logger.Info("httpserver start finished on port:%s",cfg.HttpServer.Port)
 		//这里要开异步去监听 http是否报错,报错了调用appStop 关闭全部
 		pool.Go(func() {
 			logger.Info("pool [%s] execute start", pool.Name())
 
 			err := <-s.Notify()
-			logger.Error("%s", err)
-			if err := app.Stop(ctx); err != nil {
+			//被信号关闭了
+			logger.Info("%s", err)
+			if err = app.Stop(ctx); err != nil {
 				logger.Error("%s", err)
 			}
 		})
@@ -153,6 +155,7 @@ var httpServerProvider = func(lc fx.Lifecycle, cfg *config.Config, handler http.
 	}
 	httpServerOnStop := func(ctx context.Context) error {
 		if err := s.Shutdown(ctx); err != nil {
+			logger.Error("%s", err)
 			return err
 		}
 		logger.Info("httpserver stop finished")
@@ -171,18 +174,26 @@ var dbProvider = func(lc fx.Lifecycle, cfg *config.Config, logger logger.Interfa
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			if err := db.Open(); err != nil {
+				logger.Error("%s", err)
 				return err
+			} else {
+				logger.Info("database connection opend")
 			}
-			logger.Info("database connection opend")
 
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			if err := db.SqlDb.Close(); err != nil {
-				return err
+			if db.SqlDb != nil {
+				if err := db.SqlDb.Close(); err != nil {
+					logger.Error("%s", err)
+					return err
+				}
+				logger.Info("database connection closed")
+			}else{
+				logger.Info("database connection closed when no opend")
 			}
-			logger.Info("database connection closed")
 			return nil
+
 		},
 	})
 	return db
