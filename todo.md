@@ -8,3 +8,6 @@
 //2.优化客户端grpc代码 使其默认连接
 //3.grpc转为eventbus
 //4.新增异步事件中心 （发送日志）
+
+asnycEventBus
+eventbus
