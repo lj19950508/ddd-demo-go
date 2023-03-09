@@ -12,8 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
-	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
-	"github.com/lj19950508/ddd-demo-go/pkg/eventbusimpl"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/route"
@@ -161,25 +159,3 @@ var loggerProvider = func(cfg *config.Config) logger.Interface {
 	return logger.New(cfg.Log.Level)
 }
 
-
-var mqRpcEventBusProvider = func (lc fx.Lifecycle,handler []eventbus.Dispatcher, cfg *config.Config, logger logger.Interface)eventbus.EventBus  {
-	bus,_:=eventbusimpl.NewMqRpcEventBus()
-	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			for _, v := range handler {
-				for _, d := range v.Dispatcher() {
-					bus.Subscribe(d.EventName,d.Handle)
-				}
-			}
-			bus.Start()
-			return nil
-		},
-		OnStop: func(ctx context.Context) error {
-			bus.Close()
-			return nil
-
-		},
-	})
-	return bus
-}
-// 线程内eventbug

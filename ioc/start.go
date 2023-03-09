@@ -99,7 +99,6 @@ func base() fx.Option {
 		dbProvider,
 		grpcProvider,
 		fx.Annotate(ginHandlerProvider, fx.ParamTags(`group:"routes"`)),
-		fx.Annotate(mqRpcEventBusProvider, fx.ParamTags(``,`group:"eventhandler"`)),
 		fx.Annotate(systemPoolProvider, fx.ResultTags(`name:"systemPool"`)),
 	)
 
