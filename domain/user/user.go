@@ -40,5 +40,5 @@ type UserService struct {
 }
 
 const (
-  EvtUserCreate = "123"
+  EvtUserCreate = "UserCreateEvent"
 )

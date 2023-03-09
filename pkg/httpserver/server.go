@@ -31,6 +31,8 @@ func New(handler http.Handler,opts ...Option) *Server {
 		Addr:         _defaultAddr,
 	}
 	
+	
+
 	s := &Server{
 		server:          httpServer,
 		notify:          make(chan error, 1),

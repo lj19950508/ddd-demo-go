@@ -8,6 +8,7 @@ import (
 	repositoryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user"
 	command "github.com/lj19950508/ddd-demo-go/application/command/user"
 	"github.com/lj19950508/ddd-demo-go/config"
+	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 	"go.uber.org/fx"
@@ -42,7 +43,9 @@ func repositorys() fx.Option {
 }
 
 func eventhandler() fx.Option{
-	return fx.Provide(evthandler.NewUserEventHandler)
+	return fx.Provide(
+		asEventHandler(evthandler.NewUserEventHandler),
+	)
 }
 
 func options() []fx.Option {
@@ -66,7 +69,8 @@ func options() []fx.Option {
 func invoke() fx.Option {
 	return fx.Invoke(
 		func(*httpserver.Server) {},
-		func(*evthandler.UserEventHandler) {},
+		//为了启动eventbus持续消费
+		func(eventbus.EventBus) {},
 	)
 
 }
@@ -78,7 +82,7 @@ func base() fx.Option {
 		fx.Annotate(httpHandlerProvider, fx.ParamTags(`group:"routes"`)),
 		fx.Annotate(httpServerProvider, fx.ParamTags(``, ``, ``, ``, `name:"systemPool"`)),
 		dbProvider,
-		inProcEventBusProvider,
+		fx.Annotate(inProcEventBusProvider, fx.ParamTags(``,`group:"eventhandler"`)),
 		fx.Annotate(systemPoolProvider, fx.ResultTags(`name:"systemPool"`)),
 	)
 
@@ -86,4 +90,8 @@ func base() fx.Option {
 
 func asRoute(f any) any {
 	return fx.Annotate(f, fx.As(new(ginextends.Routerable)), fx.ResultTags(`group:"routes"`))
+}
+
+func asEventHandler(f any) any {
+	return fx.Annotate(f, fx.As(new(eventbus.Dispatcher)), fx.ResultTags(`group:"eventhandler"`))
 }

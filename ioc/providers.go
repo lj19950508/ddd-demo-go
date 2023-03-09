@@ -8,15 +8,15 @@ import (
 
 	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
-	"github.com/grafana/grafana/pkg/bus"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
+	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
 	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
+	"github.com/lj19950508/ddd-demo-go/pkg/inproceventbus"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"go.uber.org/fx"
 )
-
 
 var systemPoolProvider = func() gopool.Pool {
 	//有没有释放
@@ -62,7 +62,7 @@ var httpServerProvider = func(lc fx.Lifecycle, cfg *config.Config, handler http.
 
 	httpServerOnStart := func(ctx context.Context) error {
 		s.Start()
-		logger.Info("httpserver start finished on port:%s",cfg.HttpServer.Port)
+		logger.Info("httpserver start finished on port:%s", cfg.HttpServer.Port)
 		//这里要开异步去监听 http是否报错,报错了调用appStop 关闭全部
 		pool.Go(func() {
 			logger.Info("pool [%s] execute start", pool.Name())
@@ -113,7 +113,7 @@ var dbProvider = func(lc fx.Lifecycle, cfg *config.Config, logger logger.Interfa
 					return err
 				}
 				logger.Info("database connection closed")
-			}else{
+			} else {
 				logger.Info("database connection closed when no opend")
 			}
 			return nil
@@ -128,10 +128,20 @@ var loggerProvider = func(cfg *config.Config) logger.Interface {
 }
 
 // 线程内eventbug
-var inProcEventBusProvider  = func (cfg *config.Config) bus.Bus{
-	return bus.New()
+var inProcEventBusProvider = func(lc fx.Lifecycle, disapatchers []eventbus.Dispatcher, cfg *config.Config) eventbus.EventBus {
+	eventbus := inproceventbus.NewInProcEventBus()
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			for _, disapatchItem := range disapatchers {
+				eventbus.Subscribe(disapatchItem)
+			}
+			eventbus.StartConsume()
+			eventbus.StartCompensation()
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			return nil
+		},
+	})
+	return eventbus
 }
-
-// var eventBusHandle  = func (lc fx.Lifecycle, cfg *config.Config) eventEventHandler{
-// 	return bus.New()
-// }

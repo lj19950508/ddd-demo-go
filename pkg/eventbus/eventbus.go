@@ -4,7 +4,9 @@ type Event struct {
 	Payload      any    `json:"payload"`
 	Id           int64  `json:"id"`
 	Name         string `json:"event"`
+	Return 	     bool   `json:"return"`
 	ExcuteResult any    `json:"result"`
+	Compensation string `json:"compensation"` //补偿队列的名字
 }
 
 func NewEvent(Id int64, Name string, Payload any) *Event {
@@ -14,18 +16,20 @@ func NewEvent(Id int64, Name string, Payload any) *Event {
 		Name:    Name,
 	}
 }
+//----------------------------------------------
 
 type EventBus interface {
 	Publish(evt *Event) error //receive result  bindreuslt
-	Subscribe(evt *Event) error
+	Subscribe(dispatcher Dispatcher) error
 }
 
 type DispatchInfos []DispatchInfo
 type DispatchInfo struct {
 	EventName string
-	Handle    func(evt *Event) //ctx.bind  handler,recoverry    || return data
+	Handle    EventHandler //ctx.bind  handler,recoverry    || return data
 }
 
 type Dispatcher interface {
 	Dispatcher() DispatchInfos
 }
+type EventHandler func(evt *Event) 

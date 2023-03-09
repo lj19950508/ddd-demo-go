@@ -1,6 +1,8 @@
 package command
 
 import (
+	"fmt"
+
 	userpkg "github.com/lj19950508/ddd-demo-go/domain/user"
 	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
 )
@@ -30,7 +32,11 @@ func (t UserCommandImpl) Create(cmd *CreateCommand) error {
 	if err := t.userRepository.Add(user); err != nil {
 		return err
 	}
-	err := t.eventBus.Publish(eventbus.NewEvent(0,userpkg.EvtUserCreate,nil))
+	evt:=eventbus.NewEvent(10,userpkg.EvtUserCreate,"string")
+	evt.Return=true
+	evt.Compensation="UserBuChang"
+	err := t.eventBus.Publish(evt)
+	fmt.Printf("收到了回执%+v\n",evt.ExcuteResult)
 	if err != nil {
 		return err
 	}
