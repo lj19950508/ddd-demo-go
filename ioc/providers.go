@@ -133,7 +133,9 @@ var inProcEventBusProvider = func(lc fx.Lifecycle, disapatchers []eventbus.Dispa
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			for _, disapatchItem := range disapatchers {
-				eventbus.Subscribe(disapatchItem)
+				for _, v := range disapatchItem.Dispatcher() {
+					eventbus.Subscribe(v.EventName,v.Handle)
+				}
 			}
 			eventbus.StartConsume()
 			eventbus.StartCompensation()

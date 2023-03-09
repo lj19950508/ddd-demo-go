@@ -16,13 +16,16 @@ func NewEvent(Id int64, Name string, Payload any) *Event {
 		Name:    Name,
 	}
 }
-//----------------------------------------------
 
+
+//----------------------------------------------
+type EventHandler func(evt *Event) 
 type EventBus interface {
-	Publish(evt *Event) error //receive result  bindreuslt
-	Subscribe(dispatcher Dispatcher) error
+	Publish(evt *Event) error //receive result  bindreuslt	
+	Subscribe(evt string,handler EventHandler) error
 }
 
+//-----------------------------------------
 type DispatchInfos []DispatchInfo
 type DispatchInfo struct {
 	EventName string
@@ -32,4 +35,4 @@ type DispatchInfo struct {
 type Dispatcher interface {
 	Dispatcher() DispatchInfos
 }
-type EventHandler func(evt *Event) 
+

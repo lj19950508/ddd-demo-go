@@ -38,12 +38,8 @@ func (s *InProcEventBus) Publish(evt *eventbus.Event) error {
 	return nil
 
 }
-func (s *InProcEventBus) Subscribe(disapatcher eventbus.Dispatcher) error {
-
-	for _, disapatchItem := range disapatcher.Dispatcher() {
-		//有则新增 没有则创建
-		s.handlers[disapatchItem.EventName] = append(s.handlers[disapatchItem.EventName], disapatchItem.Handle)
-	}
+func (s *InProcEventBus) Subscribe(name string, handler eventbus.EventHandler) error {
+	s.handlers[name] = append(s.handlers[name], handler)	
 	return nil
 }
 
@@ -77,7 +73,7 @@ func (s *InProcEventBus) Compensation(evt *eventbus.Event) {
 		}
 	}()
 	comEvt := eventbus.NewEvent(0, evt.Compensation, evt.Payload)
-	comEvt.ExcuteResult=false
+	comEvt.ExcuteResult = false
 	s.Publish(comEvt)
 }
 
