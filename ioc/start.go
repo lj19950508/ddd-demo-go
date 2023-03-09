@@ -101,7 +101,7 @@ func base() fx.Option {
 		fx.Annotate(httpServerProvider, fx.ParamTags(``, ``, ``, ``, `name:"systemPool"`)),
 		dbProvider,
 		ginHandlerProvider,
-		fx.Annotate(inProcEventBusProvider, fx.ParamTags(``,`group:"eventhandler"`)),
+		fx.Annotate(mqRpcEventBusProvider, fx.ParamTags(``,`group:"eventhandler"`)),
 		fx.Annotate(systemPoolProvider, fx.ResultTags(`name:"systemPool"`)),
 	)
 

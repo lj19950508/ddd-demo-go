@@ -7,7 +7,6 @@ import (
 
 	"github.com/streadway/amqp"
 
-	"github.com/evrone/go-clean-template/pkg/logger"
 	rmqrpc "github.com/evrone/go-clean-template/pkg/rabbitmq/rmq_rpc"
 )
 
@@ -28,25 +27,23 @@ type Server struct {
 	router map[string]CallHandler
 
 	timeout time.Duration
-
-	logger logger.Interface
 }
 
 // New -.
-func New(url, serverExchange string, router map[string]CallHandler, l logger.Interface, opts ...Option) (*Server, error) {
+func New(url, serverExchange string,  opts ...Option) (*Server, error) {
 	cfg := rmqrpc.Config{
 		URL:      url,
 		WaitTime: _defaultWaitTime,
 		Attempts: _defaultAttempts,
 	}
 
+	router := make(map[string]CallHandler)
 	s := &Server{
 		conn:    rmqrpc.New(serverExchange, cfg),
 		error:   make(chan error),
 		stop:    make(chan struct{}),
 		router:  router,
 		timeout: _defaultTimeout,
-		logger:  l,
 	}
 
 	// Custom options
@@ -59,10 +56,19 @@ func New(url, serverExchange string, router map[string]CallHandler, l logger.Int
 		return nil, fmt.Errorf("rmq_rpc server - NewServer - s.conn.AttemptConnect: %w", err)
 	}
 
-	go s.consumer()
 
 	return s, nil
 }
+
+
+func (s *Server) GoConsumer(){
+	go s.consumer()
+}
+
+func (s *Server) Subscribe(handler string,callHander CallHandler){
+	s.router[handler]=callHander
+}
+
 
 func (s *Server) consumer() {
 	for {
@@ -95,14 +101,16 @@ func (s *Server) serveCall(d *amqp.Delivery) {
 	if err != nil {
 		s.publish(d, nil, rmqrpc.ErrInternalServer.Error())
 
-		s.logger.Error(err, "rmq_rpc server - Server - serveCall - callHandler")
+		fmt.Println(fmt.Errorf("rmq_rpc server - Server - serveCall - callHandler:%w\n",err))
 
 		return
 	}
 
 	body, err := json.Marshal(response)
 	if err != nil {
-		s.logger.Error(err, "rmq_rpc server - Server - serveCall - json.Marshal")
+		
+		fmt.Println(fmt.Errorf("rmq_rpc server - Server - serveCall - json.Marshal:%w",err))
+		
 	}
 
 	s.publish(d, body, rmqrpc.Success)
@@ -117,7 +125,7 @@ func (s *Server) publish(d *amqp.Delivery, body []byte, status string) {
 			Body:          body,
 		})
 	if err != nil {
-		s.logger.Error(err, "rmq_rpc server - Server - publish - s.conn.Channel.Publish")
+		fmt.Println(fmt.Errorf("rmq_rpc server - Server - publish - s.conn.Channel.Publish:%w\n",err))
 	}
 }
 

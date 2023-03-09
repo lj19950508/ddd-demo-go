@@ -12,8 +12,8 @@ import (
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
+	"github.com/lj19950508/ddd-demo-go/pkg/eventbusimpl"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
-	"github.com/lj19950508/ddd-demo-go/pkg/inproceventbus"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/route"
 	"go.uber.org/fx"
@@ -143,23 +143,26 @@ var loggerProvider = func(cfg *config.Config) logger.Interface {
 	return logger.New(cfg.Log.Level)
 }
 
-// 线程内eventbug
-var inProcEventBusProvider = func(lc fx.Lifecycle, disapatchers []eventbus.Dispatcher, cfg *config.Config) eventbus.EventBus {
-	eventbus := inproceventbus.NewInProcEventBus()
+
+var mqRpcEventBusProvider = func (lc fx.Lifecycle,handler []eventbus.Dispatcher, cfg *config.Config, logger logger.Interface)eventbus.EventBus  {
+	bus,_:=eventbusimpl.NewMqRpcEventBus()
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			for _, disapatchItem := range disapatchers {
-				for _, v := range disapatchItem.Dispatcher() {
-					eventbus.Subscribe(v.EventName, v.Handle)
+			for _, v := range handler {
+				for _, d := range v.Dispatcher() {
+					bus.Subscribe(d.EventName,d.Handle)
 				}
 			}
-			eventbus.StartConsume()
-			eventbus.StartCompensation()
+			bus.Start()
+			//开始订阅..
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
+		
 			return nil
+
 		},
 	})
-	return eventbus
+	return bus
 }
+// 线程内eventbug
