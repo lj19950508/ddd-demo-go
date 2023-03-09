@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	"go.uber.org/fx"
 )
 
 
@@ -27,7 +26,7 @@ type Mysql struct {
 	Url string `env-required:"true" yaml:"url" env:"MYSQL_URL"`
 }
 
-func New(lc fx.Lifecycle) (cfg *Config) {
+func New() (cfg *Config) {
 	cfg = &Config{}
 	if err := cleanenv.ReadConfig("config/config.yml", cfg); err != nil {
 		log.Fatalf("%s",err)

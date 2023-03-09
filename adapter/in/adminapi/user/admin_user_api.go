@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	command "github.com/lj19950508/ddd-demo-go/application/command/user"
 	query "github.com/lj19950508/ddd-demo-go/application/query/user"
-	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/resultpkg"
+	"github.com/lj19950508/ddd-demo-go/pkg/route"
 )
 
 //后台用户对App用户的接口
@@ -19,13 +19,13 @@ type AdminUserApi struct {
 	logger             logger.Interface
 }
 
-func (t *AdminUserApi) Router() ginextends.RouterInfos {
-	return ginextends.RouterInfos{
+func (t *AdminUserApi) Route() *route.HttpRoutes {
+	return &route.HttpRoutes{
 		//默认使用user吧
-		{Method: "GET", Path: "/admin/users", Handle: t.List},
-		{Method: "POST", Path: "/admin/users", Handle: t.Create},
-		{Method: "PUT", Path: "/admin/users", Handle: t.Update},
-		{Method: "DELETE", Path: "/admin/users/:id", Handle: t.Delete},
+		{Pattern:"GET /admin/users",Handler: t.List},
+		{Pattern:"POST /admin/users",Handler: t.Create},
+		{Pattern:"PUT /admin/users",Handler: t.Update},
+		{Pattern:"DELETE /admin/users/:id",Handler: t.Delete},
 	}
 }
 

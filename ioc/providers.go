@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/bytedance/gopkg/util/gopool"
@@ -11,10 +12,10 @@ import (
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
 	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
-	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 	"github.com/lj19950508/ddd-demo-go/pkg/inproceventbus"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
+	"github.com/lj19950508/ddd-demo-go/pkg/route"
 	"go.uber.org/fx"
 )
 
@@ -24,9 +25,9 @@ var systemPoolProvider = func() gopool.Pool {
 	return pool
 }
 
-var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Config) http.Handler {
+var ginHandlerProvider = func(cfg *config.Config) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
-	handler := gin.New()
+	handler := gin.New()	
 	handler.Use(gin.Recovery())
 
 	handler.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
@@ -48,13 +49,28 @@ var httpHandlerProvider = func(routers []ginextends.Routerable, cfg *config.Conf
 		//else if prefix with permit(放行)
 		//else 需要登录才可以访问
 	})
+	return handler
+}
 
+var httpHandlerProvider = func( /*继续注入httphandler多框架如gin grpc*/ routers []route.Routeable, ginhandler *gin.Engine, cfg *config.Config) http.Handler {
+
+
+	mux := http.NewServeMux()
 	for _, routerGroup := range routers {
-		for _, routerItem := range routerGroup.Router() {
-			handler.Handle(routerItem.Method, routerItem.Path, routerItem.Handle)
+		for _, routerItem := range *routerGroup.Route() {
+			handlerfunc, ok := routerItem.Handler.(func(*gin.Context))
+			if ok {
+				pattern := strings.Fields(routerItem.Pattern)
+				ginhandler.Handle(pattern[0], pattern[1], handlerfunc)
+			}
 		}
 	}
-	return handler
+	//--
+	//使用多路复用
+	mux.Handle("/", ginhandler)
+	// mux.Handle("/grpc", handler)
+	// mux.Handle("/websocket", handler)
+	return mux
 }
 
 var httpServerProvider = func(lc fx.Lifecycle, cfg *config.Config, handler http.Handler, logger logger.Interface, pool gopool.Pool) *httpserver.Server {
@@ -134,7 +150,7 @@ var inProcEventBusProvider = func(lc fx.Lifecycle, disapatchers []eventbus.Dispa
 		OnStart: func(ctx context.Context) error {
 			for _, disapatchItem := range disapatchers {
 				for _, v := range disapatchItem.Dispatcher() {
-					eventbus.Subscribe(v.EventName,v.Handle)
+					eventbus.Subscribe(v.EventName, v.Handle)
 				}
 			}
 			eventbus.StartConsume()

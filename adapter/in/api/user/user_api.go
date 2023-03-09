@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	command "github.com/lj19950508/ddd-demo-go/application/command/user"
 	query "github.com/lj19950508/ddd-demo-go/application/query/user"
-	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/resultpkg"
+	"github.com/lj19950508/ddd-demo-go/pkg/route"
 )
 
 type UserApi struct {
@@ -18,10 +18,10 @@ type UserApi struct {
 	logger             logger.Interface
 }
 
-func (t *UserApi) Router() ginextends.RouterInfos {
-	return ginextends.RouterInfos{
+func (t *UserApi) Route() *route.HttpRoutes {
+	return &route.HttpRoutes{
 		//默认使用user吧
-		{Method: "GET", Path: "/v1/users/:id", Handle: t.Info},
+		{Pattern:"GET /info",Handler: t.Info},
 	}
 }
 

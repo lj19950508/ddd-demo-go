@@ -9,16 +9,21 @@ import (
 	command "github.com/lj19950508/ddd-demo-go/application/command/user"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
-	"github.com/lj19950508/ddd-demo-go/pkg/ginextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
+	"github.com/lj19950508/ddd-demo-go/pkg/route"
 	"go.uber.org/fx"
 )
 
 var app *fx.App
 
 func Run() {
+	
+
+	//根据环境
+	//config
+	//fx.add in oc config
 	app = fx.New(
-		options()...,
+		options()...,	
 	)
 	app.Run()
 }
@@ -50,6 +55,14 @@ func eventhandler() fx.Option{
 
 func options() []fx.Option {
 	options := []fx.Option{}
+
+	cfg :=config.New()
+	if(cfg.Log.Level!="debug"){
+		options = append(options, fx.NopLogger)
+	}
+	options = append(options, fx.Supply(cfg))
+	
+
 	// 基础实现层 如http mysql ，redis ，web
 	options = append(options, base())
 	// api接口
@@ -63,6 +76,12 @@ func options() []fx.Option {
 	options = append(options, eventhandler())
 	// 初始化根层 如 httpservcer socketserver
 	options = append(options, invoke())
+	//IF DEV  option 要在ioc之前
+	// fx.Populate(cfg),
+
+	// options = append(options, fx.NopLogger)
+
+
 	return options
 }
 
@@ -76,12 +95,12 @@ func invoke() fx.Option {
 }
 
 func base() fx.Option {
-	return fx.Provide(
-		config.New,
+	return fx.Provide(		
 		loggerProvider,
 		fx.Annotate(httpHandlerProvider, fx.ParamTags(`group:"routes"`)),
 		fx.Annotate(httpServerProvider, fx.ParamTags(``, ``, ``, ``, `name:"systemPool"`)),
 		dbProvider,
+		ginHandlerProvider,
 		fx.Annotate(inProcEventBusProvider, fx.ParamTags(``,`group:"eventhandler"`)),
 		fx.Annotate(systemPoolProvider, fx.ResultTags(`name:"systemPool"`)),
 	)
@@ -89,7 +108,7 @@ func base() fx.Option {
 }
 
 func asRoute(f any) any {
-	return fx.Annotate(f, fx.As(new(ginextends.Routerable)), fx.ResultTags(`group:"routes"`))
+	return fx.Annotate(f, fx.As(new(route.Routeable)), fx.ResultTags(`group:"routes"`))
 }
 
 func asEventHandler(f any) any {
