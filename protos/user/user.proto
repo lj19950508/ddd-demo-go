@@ -1,0 +1,22 @@
+syntax = "proto3";
+//生成的包名
+package login;
+//文件夹名
+option go_package ="./";
+
+message SaveEvent{
+    int64 id = 1;
+}
+
+message SaveEventRes{
+    string msg = 1;
+}
+
+//接口
+service UserCenter{
+    rpc Login(SaveEvent) returns (SaveEventRes){}
+}
+
+//protoc --go-grpc_out=. ./login.proto 生成客户端代码
+//protoc --go_out=. ./login.proto 生成服务端代码
+//protoc --go_out=. --go-grpc_out=. ./user.proto

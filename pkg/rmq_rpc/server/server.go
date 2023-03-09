@@ -101,7 +101,7 @@ func (s *Server) serveCall(d *amqp.Delivery) {
 	if err != nil {
 		s.publish(d, nil, rmqrpc.ErrInternalServer.Error())
 
-		fmt.Print(fmt.Errorf("rmq_rpc server - Server - serveCall - callHandler:%w",err))
+		fmt.Println(fmt.Errorf("rmq_rpc server - Server - serveCall - callHandler:%w",err))
 
 		return
 	}
@@ -109,7 +109,7 @@ func (s *Server) serveCall(d *amqp.Delivery) {
 	body, err := json.Marshal(response)
 	if err != nil {
 		
-		fmt.Print(fmt.Errorf("rmq_rpc server - Server - serveCall - json.Marshal:%w",err))
+		fmt.Println(fmt.Errorf("rmq_rpc server - Server - serveCall - json.Marshal:%w",err))
 		
 	}
 
@@ -125,7 +125,7 @@ func (s *Server) publish(d *amqp.Delivery, body []byte, status string) {
 			Body:          body,
 		})
 	if err != nil {
-		fmt.Print(fmt.Errorf("rmq_rpc server - Server - publish - s.conn.Channel.Publish:%w",err))
+		fmt.Println(fmt.Errorf("rmq_rpc server - Server - publish - s.conn.Channel.Publish:%w",err))
 	}
 }
 

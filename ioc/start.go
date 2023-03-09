@@ -3,13 +3,12 @@ package ioc
 import (
 	adminapi "github.com/lj19950508/ddd-demo-go/adapter/in/adminapi/user"
 	api "github.com/lj19950508/ddd-demo-go/adapter/in/api/user"
-	evthandler "github.com/lj19950508/ddd-demo-go/adapter/in/eventhandler/user"
+	"github.com/lj19950508/ddd-demo-go/adapter/in/grpc/user"
 	queryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl/user"
 	repositoryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user"
 	command "github.com/lj19950508/ddd-demo-go/application/command/user"
 	"github.com/lj19950508/ddd-demo-go/config"
-	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
-	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
+	// "github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 	"github.com/lj19950508/ddd-demo-go/pkg/route"
 	"go.uber.org/fx"
 )
@@ -47,10 +46,8 @@ func repositorys() fx.Option {
 	return fx.Provide(repositoryimpl.NewUserRepositoryImpl)
 }
 
-func eventhandler() fx.Option{
-	return fx.Provide(
-		asEventHandler(evthandler.NewUserEventHandler),
-	)
+func grpchandler() fx.Option{
+	return fx.Provide(user.NewUserApi)
 }
 
 func options() []fx.Option {
@@ -73,7 +70,7 @@ func options() []fx.Option {
 	options = append(options, cmdService())
 	// 仓储注入 writedb
 	options = append(options, repositorys())
-	options = append(options, eventhandler())
+	options = append(options, grpchandler())
 	// 初始化根层 如 httpservcer socketserver
 	options = append(options, invoke())
 	//IF DEV  option 要在ioc之前
@@ -87,9 +84,9 @@ func options() []fx.Option {
 
 func invoke() fx.Option {
 	return fx.Invoke(
-		func(*httpserver.Server) {},
+		// func(*httpserver.Server) {},
 		//为了启动eventbus持续消费
-		func(eventbus.EventBus) {},
+		func(*user.UserApi) {},
 	)
 
 }
@@ -97,10 +94,11 @@ func invoke() fx.Option {
 func base() fx.Option {
 	return fx.Provide(		
 		loggerProvider,
-		fx.Annotate(httpHandlerProvider, fx.ParamTags(`group:"routes"`)),
+		httpHandlerProvider,
 		fx.Annotate(httpServerProvider, fx.ParamTags(``, ``, ``, ``, `name:"systemPool"`)),
 		dbProvider,
-		ginHandlerProvider,
+		grpcProvider,
+		fx.Annotate(ginHandlerProvider, fx.ParamTags(`group:"routes"`)),
 		fx.Annotate(mqRpcEventBusProvider, fx.ParamTags(``,`group:"eventhandler"`)),
 		fx.Annotate(systemPoolProvider, fx.ResultTags(`name:"systemPool"`)),
 	)
@@ -109,8 +107,4 @@ func base() fx.Option {
 
 func asRoute(f any) any {
 	return fx.Annotate(f, fx.As(new(route.Routeable)), fx.ResultTags(`group:"routes"`))
-}
-
-func asEventHandler(f any) any {
-	return fx.Annotate(f, fx.As(new(eventbus.Dispatcher)), fx.ResultTags(`group:"eventhandler"`))
 }

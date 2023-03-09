@@ -48,3 +48,9 @@ func (s *MqRpcEventBus) Subscribe(name string, handler any) error {
 func (s *MqRpcEventBus) Start()  {
 	s.server.GoConsumer()
 }
+
+func (s *MqRpcEventBus) Close(){
+	s.client.Shutdown()
+	s.server.Shutdown()
+
+}

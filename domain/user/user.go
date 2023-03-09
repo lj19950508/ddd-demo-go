@@ -39,6 +39,22 @@ type UserService struct {
 	//这里的行为是一个独立的可描述的对象
 }
 
-const (
-  EvtUserCreate = "UserCreateEvent"
-)
+type EventUserCreate struct{
+	Eventname string 
+	Id int64
+	Response *EventResUserCreate
+}
+
+func NewEventUserCreate(id int64,res *EventResUserCreate) *EventUserCreate{
+	return &EventUserCreate{
+		Eventname:"UserCreateEvent",
+		Id: id,
+		Response: res,
+	}
+}
+
+type EventResUserCreate struct{
+	A string
+}
+
+

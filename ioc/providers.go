@@ -3,6 +3,7 @@ package ioc
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/route"
 	"go.uber.org/fx"
+	"google.golang.org/grpc"
 )
 
 var systemPoolProvider = func() gopool.Pool {
@@ -25,7 +27,7 @@ var systemPoolProvider = func() gopool.Pool {
 	return pool
 }
 
-var ginHandlerProvider = func(cfg *config.Config) *gin.Engine {
+var ginHandlerProvider = func(routers []route.Routeable,cfg *config.Config) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	handler := gin.New()	
 	handler.Use(gin.Recovery())
@@ -49,27 +51,43 @@ var ginHandlerProvider = func(cfg *config.Config) *gin.Engine {
 		//else if prefix with permit(放行)
 		//else 需要登录才可以访问
 	})
-	return handler
-}
-
-var httpHandlerProvider = func( /*继续注入httphandler多框架如gin grpc*/ routers []route.Routeable, ginhandler *gin.Engine, cfg *config.Config) http.Handler {
-
-
-	mux := http.NewServeMux()
 	for _, routerGroup := range routers {
 		for _, routerItem := range *routerGroup.Route() {
 			handlerfunc, ok := routerItem.Handler.(func(*gin.Context))
 			if ok {
 				pattern := strings.Fields(routerItem.Pattern)
-				ginhandler.Handle(pattern[0], pattern[1], handlerfunc)
+				handler.Handle(pattern[0], pattern[1], handlerfunc)
 			}
 		}
 	}
-	//--
-	//使用多路复用
+	return handler
+}
+
+var grpcProvider = func(lc fx.Lifecycle)*grpc.Server{
+	s := grpc.NewServer()    
+
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			
+			go func ()  {
+				lis, err := net.Listen("tcp", ":8081")
+				if err != nil {
+					fmt.Printf("failed to listen: %v", err)
+					// return
+				}
+				s.Serve(lis)
+			}()
+			return nil
+		},
+	
+	})
+
+	return s
+}
+
+var httpHandlerProvider = func(ginhandler *gin.Engine, cfg *config.Config) http.Handler {
+	mux := http.NewServeMux()
 	mux.Handle("/", ginhandler)
-	// mux.Handle("/grpc", handler)
-	// mux.Handle("/websocket", handler)
 	return mux
 }
 
@@ -154,11 +172,10 @@ var mqRpcEventBusProvider = func (lc fx.Lifecycle,handler []eventbus.Dispatcher,
 				}
 			}
 			bus.Start()
-			//开始订阅..
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-		
+			bus.Close()
 			return nil
 
 		},
