@@ -39,7 +39,7 @@ func (s *InProcEventBus) Publish(evt *eventbus.Event) error {
 
 }
 func (s *InProcEventBus) Subscribe(name string, handler eventbus.EventHandler) error {
-	s.handlers[name] = append(s.handlers[name], handler)	
+	s.handlers[name] = append(s.handlers[name], handler)
 	return nil
 }
 

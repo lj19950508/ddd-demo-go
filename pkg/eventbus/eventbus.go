@@ -1,5 +1,6 @@
 package eventbus
 
+//TODO 这个event承载太多了
 type Event struct {
 	Payload      any    `json:"payload"`
 	Id           int64  `json:"id"`
