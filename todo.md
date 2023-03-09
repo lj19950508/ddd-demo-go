@@ -11,3 +11,7 @@
 
 asnycEventBus
 eventbus
+
+cd $WORK
+go work init
+go work use ./tools/ ./tools/gopls/
