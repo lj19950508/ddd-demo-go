@@ -1,6 +1,6 @@
 package eventbus
 
-//TODO 这个event承载太多了
+//TODO 这个event承载太多了 或许可以试试用options方式gg
 type Event struct {
 	Payload      any    `json:"payload"`
 	Id           int64  `json:"id"`
