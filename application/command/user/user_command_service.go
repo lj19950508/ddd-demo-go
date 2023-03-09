@@ -1,8 +1,8 @@
 package command
 
 import (
-	"github.com/grafana/grafana/pkg/bus"
 	userpkg "github.com/lj19950508/ddd-demo-go/domain/user"
+	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
 )
 
 type UserCommandService interface {
@@ -15,10 +15,10 @@ type UserCommandService interface {
 
 type UserCommandImpl struct {
 	userRepository userpkg.UserRepository
-	eventBus       bus.Bus
+	eventBus       eventbus.EventBus
 }
 
-func NewUserCommandImpl(userRepository userpkg.UserRepository, eventBus bus.Bus) UserCommandService {
+func NewUserCommandImpl(userRepository userpkg.UserRepository, eventBus eventbus.EventBus) UserCommandService {
 	return &UserCommandImpl{
 		userRepository: userRepository,
 		eventBus:       eventBus,
@@ -30,10 +30,7 @@ func (t UserCommandImpl) Create(cmd *CreateCommand) error {
 	if err := t.userRepository.Add(user); err != nil {
 		return err
 	}
-	err := t.eventBus.Publish(&userpkg.EvtUserCreate{
-		Id:   user.Id,
-		Name: user.Name,
-	})
+	err := t.eventBus.Publish(eventbus.NewEvent(0,userpkg.EvtUserCreate,nil))
 	if err != nil {
 		return err
 	}

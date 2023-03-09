@@ -39,7 +39,6 @@ type UserService struct {
 	//这里的行为是一个独立的可描述的对象
 }
 
-type EvtUserCreate struct{
-	Id int64
-	Name string
-}
+const (
+  EvtUserCreate = "123"
+)
