@@ -53,6 +53,7 @@ func (s *Server) Start() {
 	}()
 }
 
+
 //chan是error类型，（从隧道流出到变量里）
 // Notify -.
 func (s *Server) Notify() <-chan error {

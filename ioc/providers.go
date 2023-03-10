@@ -3,6 +3,7 @@ package ioc
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -18,10 +19,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-
-var ginHandlerProvider = func(routers []route.Routeable,lc fx.Lifecycle,cfg *config.Config, logger logger.Interface) *gin.Engine {
+var ginHandlerProvider = func(routers []route.Routeable, lc fx.Lifecycle, cfg *config.Config, logger logger.Interface) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
-	handler := gin.New()	
+	handler := gin.New()
 	handler.Use(gin.Recovery())
 
 	handler.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
@@ -58,7 +58,7 @@ var ginHandlerProvider = func(routers []route.Routeable,lc fx.Lifecycle,cfg *con
 		httpserver.Start()
 		logger.Info("httpserver start finished on port:%s", cfg.HttpServer.Port)
 		//这里要开异步去监听 http是否报错,报错了调用appStop 关闭全部
-		go(func() {
+		go (func() {
 			err := <-httpserver.Notify()
 			//被信号关闭了
 			logger.Info("%s", err)
@@ -85,32 +85,36 @@ var ginHandlerProvider = func(routers []route.Routeable,lc fx.Lifecycle,cfg *con
 	return handler
 }
 
-var grpcProvider = func(grpcHandlers []grpcextends.GrpcHandler,lc fx.Lifecycle,cfg *config.Config, logger logger.Interface)*grpc.Server{
-	grpcServer := grpc.NewServer()    	
-	server := httpserver.New(grpcServer, httpserver.Port(cfg.GrpcServer.Port))
+var grpcProvider = func(grpcHandlers []grpcextends.GrpcHandler, lc fx.Lifecycle, cfg *config.Config, logger logger.Interface) *grpc.Server {
+
+	grpcServer := grpc.NewServer()
+
+	// server := httpserver.New(grpcServer, httpserver.Port(cfg.GrpcServer.Port))
 	grpcServerOnStart := func(ctx context.Context) error {
-		server.Start()
 		for _, handler := range grpcHandlers {
 			handler.Register(grpcServer)
 		}
-		logger.Info("grpcserver start finished on port:%s", cfg.GrpcServer.Port)
-		//这里要开异步去监听 http是否报错,报错了调用appStop 关闭全部
-		go(func() {
-			err := <-server.Notify()
-			//被信号关闭了
-			logger.Info("%s", err)
-			if err = app.Stop(ctx); err != nil {
-				logger.Error("%s", err)
+		// server.Start()
+		go func() {
+			ls, err := net.Listen("tcp", ":"+cfg.GrpcServer.Port)
+			if err != nil {
+				logger.Fatal("grpcServer start err %s", err)
 			}
-		})()
+			logger.Info("grpcserver start finished on port:%s", cfg.GrpcServer.Port)
+			err = grpcServer.Serve(ls)
+			if err != nil {
+				//server会自动重连然 后报错
+				logger.Fatal("grpcServer connect err %s", err)
+			}
+
+		}()
+
 		return nil
 	}
 	grpcServerOnStop := func(ctx context.Context) error {
-		if err := server.Shutdown(ctx); err != nil {
-			logger.Error("%s", err)
-			return err
-		}
+		grpcServer.Stop()
 		logger.Info("grpcserver stop finished")
+
 		return nil
 	}
 
@@ -120,9 +124,6 @@ var grpcProvider = func(grpcHandlers []grpcextends.GrpcHandler,lc fx.Lifecycle,c
 	})
 	return grpcServer
 }
-
-
- 
 
 var dbProvider = func(lc fx.Lifecycle, cfg *config.Config, logger logger.Interface) *db.DB {
 	db := db.New(cfg.Mysql.Url, db.MaxIdleConns(10), db.MaxOpenConns(100), db.ConnMaxLifetime(time.Hour))
@@ -157,4 +158,3 @@ var dbProvider = func(lc fx.Lifecycle, cfg *config.Config, logger logger.Interfa
 var loggerProvider = func(cfg *config.Config) logger.Interface {
 	return logger.New(cfg.Log.Level)
 }
-
