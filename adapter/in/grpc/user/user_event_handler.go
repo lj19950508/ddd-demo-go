@@ -1,4 +1,4 @@
-package user
+package grpchandler
 
 import (
 	"context"
@@ -7,14 +7,16 @@ import (
 	"google.golang.org/grpc"
 )
 
-type UserApi struct{
+type UserApi struct {
 	pb.UnimplementedUserCenterServer
 }
 
-func NewUserApi (s *grpc.Server) *UserApi{
-	UserApi := &UserApi{}
-	pb.RegisterUserCenterServer(s,UserApi)
-	return  UserApi
+func (s *UserApi) Register(grpc *grpc.Server) {
+	pb.RegisterUserCenterServer(grpc, s)
+}
+
+func NewUserApi() *UserApi {
+	return &UserApi{}
 }
 
 func (s *UserApi) Login(ctx context.Context, in *pb.SaveEvent) (*pb.SaveEventRes, error) {

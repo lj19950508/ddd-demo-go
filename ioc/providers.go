@@ -6,9 +6,11 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
+	"github.com/lj19950508/ddd-demo-go/pkg/grpcextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 	"github.com/lj19950508/ddd-demo-go/pkg/logger"
 	"github.com/lj19950508/ddd-demo-go/pkg/route"
@@ -83,11 +85,14 @@ var ginHandlerProvider = func(routers []route.Routeable,lc fx.Lifecycle,cfg *con
 	return handler
 }
 
-var grpcProvider = func(lc fx.Lifecycle,cfg *config.Config, logger logger.Interface)*grpc.Server{
-	grpchandler := grpc.NewServer()    
-	server := httpserver.New(grpchandler, httpserver.Port(cfg.GrpcServer.Port))
+var grpcProvider = func(grpcHandlers []grpcextends.GrpcHandler,lc fx.Lifecycle,cfg *config.Config, logger logger.Interface)*grpc.Server{
+	grpcServer := grpc.NewServer()    	
+	server := httpserver.New(grpcServer, httpserver.Port(cfg.GrpcServer.Port))
 	grpcServerOnStart := func(ctx context.Context) error {
 		server.Start()
+		for _, handler := range grpcHandlers {
+			handler.Register(grpcServer)
+		}
 		logger.Info("grpcserver start finished on port:%s", cfg.GrpcServer.Port)
 		//这里要开异步去监听 http是否报错,报错了调用appStop 关闭全部
 		go(func() {
@@ -113,7 +118,7 @@ var grpcProvider = func(lc fx.Lifecycle,cfg *config.Config, logger logger.Interf
 		OnStart: grpcServerOnStart,
 		OnStop:  grpcServerOnStop,
 	})
-	return grpchandler
+	return grpcServer
 }
 
 

@@ -7,11 +7,13 @@ import (
 	"github.com/lj19950508/ddd-demo-go/adapter/in/grpc/user"
 	queryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl/user"
 	repositoryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user"
-	command "github.com/lj19950508/ddd-demo-go/application/command/user"
-	"github.com/lj19950508/ddd-demo-go/config"
 	"google.golang.org/grpc"
 
+	command "github.com/lj19950508/ddd-demo-go/application/command/user"
+	"github.com/lj19950508/ddd-demo-go/config"
+
 	// "github.com/lj19950508/ddd-demo-go/pkg/httpserver"
+	"github.com/lj19950508/ddd-demo-go/pkg/grpcextends"
 	"github.com/lj19950508/ddd-demo-go/pkg/route"
 	"go.uber.org/fx"
 )
@@ -49,8 +51,10 @@ func repositorys() fx.Option {
 	return fx.Provide(repositoryimpl.NewUserRepositoryImpl)
 }
 
-func grpchandler() fx.Option{
-	return fx.Provide(user.NewUserApi)
+func grpcapi() fx.Option{
+	return fx.Provide(
+		asGrpcHandler(grpchandler.NewUserApi),
+	)
 }
 
 func options() []fx.Option {
@@ -73,7 +77,7 @@ func options() []fx.Option {
 	options = append(options, cmdService())
 	// 仓储注入 writedb
 	options = append(options, repositorys())
-	options = append(options, grpchandler())
+	options = append(options, grpcapi())
 	// 初始化根层 如 httpservcer socketserver
 	options = append(options, invoke())
 	//IF DEV  option 要在ioc之前
@@ -89,7 +93,7 @@ func invoke() fx.Option {
 	return fx.Invoke(
 		func(*gin.Engine) {},
 		func(*grpc.Server) {},
-		func(*user.UserApi) {},
+		// func(*user.UserApi) {},
 	)
 
 }
@@ -97,14 +101,19 @@ func invoke() fx.Option {
 func base() fx.Option {
 	return fx.Provide(
 		//定义服务名
-		grpcProvider,
 		loggerProvider,
 		dbProvider,
 		fx.Annotate(ginHandlerProvider, fx.ParamTags(`group:"routes"`)),
+		fx.Annotate(grpcProvider, fx.ParamTags(`group:"grpchandlers"`)),
+
 	)
 
 }
 
 func asRoute(f any) any {
 	return fx.Annotate(f, fx.As(new(route.Routeable)), fx.ResultTags(`group:"routes"`))
+}
+
+func asGrpcHandler(f any) any {
+	return fx.Annotate(f, fx.As(new(grpcextends.GrpcHandler)), fx.ResultTags(`group:"grpchandlers"`))
 }
