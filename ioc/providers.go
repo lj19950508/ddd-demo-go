@@ -101,7 +101,7 @@ var grpcProvider = func(grpcHandlers []grpcextends.GrpcHandler, lc fx.Lifecycle,
 				logger.Fatal("grpcServer start err %s", err)
 			}
 			logger.Info("grpcserver start finished on port:%s", cfg.GrpcServer.Port)
-			err = grpcServer.Serve(ls)
+			grpcServer.Serve(ls)
 			if err != nil {
 				//server会自动重连然 后报错
 				logger.Fatal("grpcServer connect err %s", err)
