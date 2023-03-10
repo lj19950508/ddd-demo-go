@@ -15,9 +15,16 @@ type Config struct {
 	Mysql Mysql `yaml:"mysql"`
 }
 
+
 type GrpcServer struct{
 	Port  string `env-required:"true" yaml:"port"    env:"GRPC_PORT"`
+	RpcTarget RpcTarget `env-required:"true" yaml:"services"    env:"GRPC_PORT"`
 }
+
+type RpcTarget struct{
+	ProductService string `yaml:"product"`
+}
+
 
 type HttpServer struct{
 	Port  string `env-required:"true" yaml:"port"    env:"HTTP_PORT"`

@@ -2,6 +2,9 @@ httpserver:
   port: 8080
 grpcserver:
   port: 8081
+  services:
+    product: 127.0.0.1:8081
+    
 logger:
   level: debug
 mysql:

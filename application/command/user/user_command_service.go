@@ -1,7 +1,9 @@
 package command
 
 import (
+	"github.com/lj19950508/ddd-demo-go/application/rpcsender/product"
 	userpkg "github.com/lj19950508/ddd-demo-go/domain/user"
+	pb "github.com/lj19950508/ddd-demo-go/protos/user"
 )
 
 type UserCommandService interface {
@@ -14,11 +16,13 @@ type UserCommandService interface {
 
 type UserCommandImpl struct {
 	userRepository userpkg.UserRepository
+	productSender  rpcsender.RpcSender
 }
 
-func NewUserCommandImpl(userRepository userpkg.UserRepository) UserCommandService {
+func NewUserCommandImpl(userRepository userpkg.UserRepository,productSender rpcsender.RpcSender) UserCommandService {
 	return &UserCommandImpl{
 		userRepository: userRepository,
+		productSender: productSender,
 	}
 }
 
@@ -27,32 +31,10 @@ func (t UserCommandImpl) Create(cmd *CreateCommand) error {
 	if err := t.userRepository.Add(user); err != nil {
 		return err
 	}
-
-	// orderservice->
-
-	// addr := flag.String("addr", "127.0.0.1:8081", "the address to connect to")
-	// conn, err := grpc.Dial(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	// if err != nil {
-	// 	log.Fatalf("did not connect: %v", err)
-	// }
-	// defer conn.Close()
-	// c:=pb.NewUserCenterClient(conn)
-	// ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	// defer cancel()
-	// r,err:=c.Login(ctx,&pb.SaveEvent{Id: 1})
-	// if err != nil {
-	// 	log.Fatalf("could not greet: %v", err)
-	// }
-	// log.Printf("Greeting: %s", r.GetMsg())
-
-	// res:=userpkg.EventResUserCreate{}
-	// event:=userpkg.NewEventUserCreate(1,&res)
-	// evt:=eventbus.NewEvent(event.Eventname,event)
-	// err := t.eventBus.Publish(evt)
-	// if err != nil {
-		// return err
-	// }/
-	// fmt.Println(res)
+	_,err:=t.productSender.ProductSave(&pb.SaveEvent{Id: 100})
+	if(err!=nil){
+		return err
+	}
 
 	return nil
 }

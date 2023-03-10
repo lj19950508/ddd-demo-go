@@ -6,6 +6,7 @@ import (
 	api "github.com/lj19950508/ddd-demo-go/adapter/in/api/user"
 	"github.com/lj19950508/ddd-demo-go/adapter/in/grpc/user"
 	queryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/queryimpl/user"
+	"github.com/lj19950508/ddd-demo-go/adapter/out/grpcclient/user"
 	repositoryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user"
 	"google.golang.org/grpc"
 
@@ -57,6 +58,10 @@ func grpcapi() fx.Option{
 	)
 }
 
+func grpcsender() fx.Option{
+	return fx.Provide(grpcclient.NewUserRpcSender)
+}
+
 func options() []fx.Option {
 	options := []fx.Option{}
 
@@ -78,6 +83,7 @@ func options() []fx.Option {
 	// 仓储注入 writedb
 	options = append(options, repositorys())
 	options = append(options, grpcapi())
+	options = append(options, grpcsender())
 	// 初始化根层 如 httpservcer socketserver
 	options = append(options, invoke())
 	//IF DEV  option 要在ioc之前
