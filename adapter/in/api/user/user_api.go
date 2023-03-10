@@ -34,7 +34,6 @@ func NewUserApi(userCommandService command.UserCommandService, userQueryService 
 }
 
 
-
 func (t *UserApi) Info(c *gin.Context) {
 	id :=c.Param("id")
 	userId ,err:= strconv.ParseInt(id,10,64)

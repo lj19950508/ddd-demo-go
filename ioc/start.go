@@ -1,6 +1,7 @@
 package ioc
 
 import (
+	"github.com/gin-gonic/gin"
 	adminapi "github.com/lj19950508/ddd-demo-go/adapter/in/adminapi/user"
 	api "github.com/lj19950508/ddd-demo-go/adapter/in/api/user"
 	"github.com/lj19950508/ddd-demo-go/adapter/in/grpc/user"
@@ -8,6 +9,8 @@ import (
 	repositoryimpl "github.com/lj19950508/ddd-demo-go/adapter/out/repositoryimpl/user"
 	command "github.com/lj19950508/ddd-demo-go/application/command/user"
 	"github.com/lj19950508/ddd-demo-go/config"
+	"google.golang.org/grpc"
+
 	// "github.com/lj19950508/ddd-demo-go/pkg/httpserver"
 	"github.com/lj19950508/ddd-demo-go/pkg/route"
 	"go.uber.org/fx"
@@ -84,22 +87,20 @@ func options() []fx.Option {
 
 func invoke() fx.Option {
 	return fx.Invoke(
-		// func(*httpserver.Server) {},
-		//为了启动eventbus持续消费
+		func(*gin.Engine) {},
+		func(*grpc.Server) {},
 		func(*user.UserApi) {},
 	)
 
 }
 
 func base() fx.Option {
-	return fx.Provide(		
-		loggerProvider,
-		httpHandlerProvider,
-		fx.Annotate(httpServerProvider, fx.ParamTags(``, ``, ``, ``, `name:"systemPool"`)),
-		dbProvider,
+	return fx.Provide(
+		//定义服务名
 		grpcProvider,
+		loggerProvider,
+		dbProvider,
 		fx.Annotate(ginHandlerProvider, fx.ParamTags(`group:"routes"`)),
-		fx.Annotate(systemPoolProvider, fx.ResultTags(`name:"systemPool"`)),
 	)
 
 }

@@ -10,8 +10,13 @@ import (
 //分清哪些是必须 哪些可以默认
 type Config struct {
 	HttpServer HttpServer `yaml:"httpserver"`
+	GrpcServer  `yaml:"grpcserver"`
 	Log Log   `yaml:"logger"`
 	Mysql Mysql `yaml:"mysql"`
+}
+
+type GrpcServer struct{
+	Port  string `env-required:"true" yaml:"port"    env:"GRPC_PORT"`
 }
 
 type HttpServer struct{

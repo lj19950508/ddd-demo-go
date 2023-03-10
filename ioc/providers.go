@@ -3,12 +3,9 @@ package ioc
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/bytedance/gopkg/util/gopool"
 	"github.com/gin-gonic/gin"
 	"github.com/lj19950508/ddd-demo-go/config"
 	"github.com/lj19950508/ddd-demo-go/pkg/db"
@@ -19,13 +16,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-var systemPoolProvider = func() gopool.Pool {
-	//有没有释放
-	pool := gopool.NewPool("system", int32(100), &gopool.Config{ScaleThreshold: 80})
-	return pool
-}
 
-var ginHandlerProvider = func(routers []route.Routeable,cfg *config.Config) *gin.Engine {
+var ginHandlerProvider = func(routers []route.Routeable,lc fx.Lifecycle,cfg *config.Config, logger logger.Interface) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	handler := gin.New()	
 	handler.Use(gin.Recovery())
@@ -58,59 +50,25 @@ var ginHandlerProvider = func(routers []route.Routeable,cfg *config.Config) *gin
 			}
 		}
 	}
-	return handler
-}
-
-var grpcProvider = func(lc fx.Lifecycle)*grpc.Server{
-	s := grpc.NewServer()    
-
-	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			
-			go func ()  {
-				lis, err := net.Listen("tcp", ":8081")
-				if err != nil {
-					fmt.Printf("failed to listen: %v", err)
-					// return
-				}
-				s.Serve(lis)
-			}()
-			return nil
-		},
-	
-	})
-
-	return s
-}
-
-var httpHandlerProvider = func(ginhandler *gin.Engine, cfg *config.Config) http.Handler {
-	mux := http.NewServeMux()
-	mux.Handle("/", ginhandler)
-	return mux
-}
-
-var httpServerProvider = func(lc fx.Lifecycle, cfg *config.Config, handler http.Handler, logger logger.Interface, pool gopool.Pool) *httpserver.Server {
-	s := httpserver.New(handler, httpserver.Port(cfg.HttpServer.Port))
+	httpserver := httpserver.New(handler, httpserver.Port(cfg.HttpServer.Port))
 
 	httpServerOnStart := func(ctx context.Context) error {
-		s.Start()
+		httpserver.Start()
 		logger.Info("httpserver start finished on port:%s", cfg.HttpServer.Port)
 		//这里要开异步去监听 http是否报错,报错了调用appStop 关闭全部
-		pool.Go(func() {
-			logger.Info("pool [%s] execute start", pool.Name())
-
-			err := <-s.Notify()
+		go(func() {
+			err := <-httpserver.Notify()
 			//被信号关闭了
 			logger.Info("%s", err)
 			if err = app.Stop(ctx); err != nil {
 				logger.Error("%s", err)
 			}
-		})
+		})()
 
 		return nil
 	}
 	httpServerOnStop := func(ctx context.Context) error {
-		if err := s.Shutdown(ctx); err != nil {
+		if err := httpserver.Shutdown(ctx); err != nil {
 			logger.Error("%s", err)
 			return err
 		}
@@ -122,8 +80,44 @@ var httpServerProvider = func(lc fx.Lifecycle, cfg *config.Config, handler http.
 		OnStart: httpServerOnStart,
 		OnStop:  httpServerOnStop,
 	})
-	return s
+	return handler
 }
+
+var grpcProvider = func(lc fx.Lifecycle,cfg *config.Config, logger logger.Interface)*grpc.Server{
+	grpchandler := grpc.NewServer()    
+	server := httpserver.New(grpchandler, httpserver.Port(cfg.GrpcServer.Port))
+	grpcServerOnStart := func(ctx context.Context) error {
+		server.Start()
+		logger.Info("grpcserver start finished on port:%s", cfg.GrpcServer.Port)
+		//这里要开异步去监听 http是否报错,报错了调用appStop 关闭全部
+		go(func() {
+			err := <-server.Notify()
+			//被信号关闭了
+			logger.Info("%s", err)
+			if err = app.Stop(ctx); err != nil {
+				logger.Error("%s", err)
+			}
+		})()
+		return nil
+	}
+	grpcServerOnStop := func(ctx context.Context) error {
+		if err := server.Shutdown(ctx); err != nil {
+			logger.Error("%s", err)
+			return err
+		}
+		logger.Info("grpcserver stop finished")
+		return nil
+	}
+
+	lc.Append(fx.Hook{
+		OnStart: grpcServerOnStart,
+		OnStop:  grpcServerOnStop,
+	})
+	return grpchandler
+}
+
+
+ 
 
 var dbProvider = func(lc fx.Lifecycle, cfg *config.Config, logger logger.Interface) *db.DB {
 	db := db.New(cfg.Mysql.Url, db.MaxIdleConns(10), db.MaxOpenConns(100), db.ConnMaxLifetime(time.Hour))

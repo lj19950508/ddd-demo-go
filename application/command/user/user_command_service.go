@@ -1,15 +1,7 @@
 package command
 
 import (
-	"context"
-	"flag"
-	"log"
-	"time"
 	userpkg "github.com/lj19950508/ddd-demo-go/domain/user"
-	"github.com/lj19950508/ddd-demo-go/pkg/eventbus"
-	pb "github.com/lj19950508/ddd-demo-go/protos/user"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type UserCommandService interface {
@@ -22,13 +14,11 @@ type UserCommandService interface {
 
 type UserCommandImpl struct {
 	userRepository userpkg.UserRepository
-	eventBus       eventbus.EventBus
 }
 
-func NewUserCommandImpl(userRepository userpkg.UserRepository, eventBus eventbus.EventBus) UserCommandService {
+func NewUserCommandImpl(userRepository userpkg.UserRepository) UserCommandService {
 	return &UserCommandImpl{
 		userRepository: userRepository,
-		eventBus:       eventBus,
 	}
 }
 
@@ -37,20 +27,23 @@ func (t UserCommandImpl) Create(cmd *CreateCommand) error {
 	if err := t.userRepository.Add(user); err != nil {
 		return err
 	}
-	addr := flag.String("addr", "127.0.0.1:8081", "the address to connect to")
-	conn, err := grpc.Dial(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
-	c:=pb.NewUserCenterClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	r,err:=c.Login(ctx,&pb.SaveEvent{Id: 1})
-	if err != nil {
-		log.Fatalf("could not greet: %v", err)
-	}
-	log.Printf("Greeting: %s", r.GetMsg())
+
+	// orderservice->
+
+	// addr := flag.String("addr", "127.0.0.1:8081", "the address to connect to")
+	// conn, err := grpc.Dial(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// if err != nil {
+	// 	log.Fatalf("did not connect: %v", err)
+	// }
+	// defer conn.Close()
+	// c:=pb.NewUserCenterClient(conn)
+	// ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	// defer cancel()
+	// r,err:=c.Login(ctx,&pb.SaveEvent{Id: 1})
+	// if err != nil {
+	// 	log.Fatalf("could not greet: %v", err)
+	// }
+	// log.Printf("Greeting: %s", r.GetMsg())
 
 	// res:=userpkg.EventResUserCreate{}
 	// event:=userpkg.NewEventUserCreate(1,&res)

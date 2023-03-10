@@ -7,14 +7,6 @@ package eventhandler
 // 	"github.com/streadway/amqp"
 // )
 
-//这个改成类似api的处理
-//然后有一个eventbushandler 是
-//用户子域的事件处理
-
-//EventHandler inteface has a router  routerInfo [message,func]
-//TODO eventbus need eventhandler[]  and eventbus foreach .AddEventListenr()
-//   Queue=>func (evt *user.EvtUserCreate) error
-// so just need eventbu
 
 // type UserEventHandler struct {
 // 	logger   logger.Interface
@@ -44,6 +36,5 @@ package eventhandler
 // 	s.logger.Info("some thing happend %v",req)
 // 	return &Response{A:1},nil
 // }
-// //compensation 补偿怎么写
 
 

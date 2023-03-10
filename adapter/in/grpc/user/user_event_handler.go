@@ -19,4 +19,5 @@ func NewUserApi (s *grpc.Server) *UserApi{
 
 func (s *UserApi) Login(ctx context.Context, in *pb.SaveEvent) (*pb.SaveEventRes, error) {
 	return &pb.SaveEventRes{Msg: "Hello " + string(rune(in.Id))}, nil
+	//eventbus.pu
 }
