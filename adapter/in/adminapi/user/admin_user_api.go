@@ -36,7 +36,7 @@ func NewAdminUserApi(userCommandService command.UserCommandService, userQuerySer
 		logger:             logger,
 	}
 }
-
+												
 func (t *AdminUserApi) List(c *gin.Context) {
 	var cond query.UserPageQuery
 	err := c.Bind(&cond)

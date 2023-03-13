@@ -55,9 +55,10 @@ func (t *UserQueryServiceImpl) FindList(cond *query.UserPageQuery) (*query.PageR
 		if cond.NameLike != nil {
 			d.Where("name LIKE ?", "%"+*cond.NameLike+"%")
 		}
-		d.Offset(cond.Page * cond.Size).Limit(cond.Size)
+		// d.Offset(cond.Page * cond.Size).Limit(cond.Size)
 		return d
-	}).Find(&userPo).Count(&count); result.Error != nil {
+	}).Model(&userPo).Count(&count).Offset(cond.Page * cond.Size).Limit(cond.Size).Find(&userPo) ;result.Error != nil {
+		//先查询总数， 再附加分页条件再查询
 		return nil, errors.WithStack(result.Error)
 	}
 
