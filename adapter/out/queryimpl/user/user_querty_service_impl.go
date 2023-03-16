@@ -9,7 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 type UserQueryServiceImpl struct {
 	*db.DB
 	logger.Interface
@@ -45,23 +44,40 @@ func (t *UserQueryServiceImpl) FindOne(cond *query.UserQuery) (*query.UserResult
 }
 
 func (t *UserQueryServiceImpl) FindList(cond *query.UserPageQuery) (*query.PageResult[query.UserResult], error) {
+	//tx:=context.GET(Tx)
+	//if tx==nil -> tx.create // tx.trascation(func(db *grom)) -> db.Create
+	// PROPAGATION_REQUIRED：如果不存在外层事务，就主动创建事务；否则使用外层事务
+	// PROPAGATION_SUPPORTS：如果不存在外层事务，就不开启事务；否则使用外层事务
+	// PROPAGATION_MANDATORY：如果不存在外层事务，就抛出异常；否则使用外层事务
+	// PROPAGATION_REQUIRES_NEW：总是主动开启事务；如果存在外层事务，就将外层事务挂起
+	// PROPAGATION_NOT_SUPPORTED：总是不开启事务；如果存在外层事务，就将外层事务挂起
+	// PROPAGATION_NEVER：总是不开启事务；如果存在外层事务，则抛出异常
+	// PROPAGATION_NESTED：如果不存在外层事务，就主动创建事务；否则创建嵌套的子事务
 	var userPo []po.User
 	var count int64
 	//组装查询语句
-	if result := t.GormDb.Scopes(func(d *gorm.DB) *gorm.DB {
+	scope := t.GormDb.Scopes(func(d *gorm.DB) *gorm.DB {
 		if cond.IdEq != nil {
 			d.Where("id=?", *cond.IdEq)
 		}
 		if cond.NameLike != nil {
 			d.Where("name LIKE ?", "%"+*cond.NameLike+"%")
 		}
-		// d.Offset(cond.Page * cond.Size).Limit(cond.Size)
 		return d
-	}).Model(&userPo).Count(&count).Offset(cond.Page * cond.Size).Limit(cond.Size).Find(&userPo) ;result.Error != nil {
-		//先查询总数， 再附加分页条件再查询
-		return nil, errors.WithStack(result.Error)
+	})
+	//读一致性
+	err := t.GormDb.Transaction(func(tx *gorm.DB) error {
+		if db := scope.Model(&userPo).Count(&count).Offset(cond.Page * cond.Size); db.Error != nil {
+			return errors.WithStack(db.Error)
+		}
+		if db := scope.Model(&userPo).Find(&userPo); db.Error != nil {
+			return errors.WithStack(db.Error)
+		}
+		return nil
+	})
+	if(err!=nil){
+		return nil,err
 	}
-
 	var result []query.UserResult
 	for i := range userPo {
 		result = append(result, *query.NewUserResult(userPo[i].ID, userPo[i].Name))
