@@ -56,27 +56,24 @@ func (t *UserQueryServiceImpl) FindList(cond *query.UserPageQuery) (*query.PageR
 	var userPo []po.User
 	var count int64
 	//组装查询语句
-	scope := t.GormDb.Scopes(func(d *gorm.DB) *gorm.DB {
-		if cond.IdEq != nil {
-			d.Where("id=?", *cond.IdEq)
-		}
-		if cond.NameLike != nil {
-			d.Where("name LIKE ?", "%"+*cond.NameLike+"%")
-		}
-		return d
-	})
+
 	//读一致性
 	err := t.GormDb.Transaction(func(tx *gorm.DB) error {
-		if db := scope.Model(&userPo).Count(&count).Offset(cond.Page * cond.Size); db.Error != nil {
-			return errors.WithStack(db.Error)
-		}
-		if db := scope.Model(&userPo).Find(&userPo); db.Error != nil {
+		if db := tx.Scopes(func(d *gorm.DB) *gorm.DB {
+			if cond.IdEq != nil {
+				d.Where("id=?", *cond.IdEq)
+			}
+			if cond.NameLike != nil {
+				d.Where("name LIKE ?", "%"+*cond.NameLike+"%")
+			}
+			return d
+		}).Model(&userPo).Count(&count).Offset(cond.Page * cond.Size).Find(&userPo); db.Error != nil {
 			return errors.WithStack(db.Error)
 		}
 		return nil
 	})
-	if(err!=nil){
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
 	var result []query.UserResult
 	for i := range userPo {
